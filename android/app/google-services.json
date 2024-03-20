@@ -1,0 +1,98 @@
+{
+  "project_info": {
+    "project_number": "64503771835",
+    "project_id": "mentalsehat-3f3ec",
+    "storage_bucket": "mentalsehat-3f3ec.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:64503771835:android:5f22f5966b182924be6f9e",
+        "android_client_info": {
+          "package_name": "com.example.mental_sehat"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "64503771835-pbs5d6k9b0mht1gsqub78tjhcmg4n4gm.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.mental_sehat",
+            "certificate_hash": "f2bb4faddaef62b5831cd5977982c93c2f4c393f"
+          }
+        },
+        {
+          "client_id": "64503771835-k4fmhdi4djlrid26v84fjp1dqm9s150p.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyA6N3vh3AcqQhoBHUhNi8fSwQURz64ONhc"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "64503771835-k4fmhdi4djlrid26v84fjp1dqm9s150p.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "64503771835-5tarrn8lu7ssbrdbo111nceepc135kkq.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.example.mentalsehat"
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:64503771835:android:b8691a30a77fae02be6f9e",
+        "android_client_info": {
+          "package_name": "com.example.mentalsehat"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "64503771835-fajst05fo5v5jnt0c2be4ta5cdvj09el.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.mentalsehat",
+            "certificate_hash": "f2bb4faddaef62b5831cd5977982c93c2f4c393f"
+          }
+        },
+        {
+          "client_id": "64503771835-k4fmhdi4djlrid26v84fjp1dqm9s150p.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyA6N3vh3AcqQhoBHUhNi8fSwQURz64ONhc"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "64503771835-k4fmhdi4djlrid26v84fjp1dqm9s150p.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "64503771835-5tarrn8lu7ssbrdbo111nceepc135kkq.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.example.mentalsehat"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
