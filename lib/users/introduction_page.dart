@@ -17,6 +17,8 @@ class _IntroductionPageState extends State<IntroductionPage> {
   String _selectedAgama = 'Islam';
   TextEditingController _namaController = TextEditingController();
   TextEditingController _umurController = TextEditingController();
+  TextEditingController _tanggalController = TextEditingController();
+  String _selectedGender = '';
   String _email = '';
   final Connectivity _connectivity = Connectivity();
   late StreamSubscription<ConnectivityResult> _connectivitySubscription;
@@ -181,6 +183,85 @@ class _IntroductionPageState extends State<IntroductionPage> {
                       ),
                       SizedBox(height: 25),
                       DropdownButtonFormField(
+                        // Form untuk jenis kelamin
+                        value: null,
+                        items: [
+                          'Laki-laki',
+                          'Perempuan',
+                        ].map((gender) {
+                          return DropdownMenuItem(
+                            value: gender,
+                            child: Text(
+                              gender,
+                              style: TextStyle(fontFamily: 'Poppins'),
+                            ),
+                          );
+                        }).toList(),
+                        onChanged: (newValue) {
+                          setState(() {
+                            _selectedGender = newValue.toString();
+                          });
+                        },
+                        decoration: InputDecoration(
+                          labelText: 'Jenis Kelamin',
+                          labelStyle: TextStyle(
+                            fontFamily: 'Poppins',
+                          ),
+                          enabledBorder: OutlineInputBorder(
+                            borderSide: BorderSide(color: Color(0xFF04558F)),
+                            borderRadius: BorderRadius.circular(8.0),
+                          ),
+                          focusedBorder: OutlineInputBorder(
+                            borderSide: BorderSide(color: Color(0xFF04558F)),
+                            borderRadius: BorderRadius.circular(8.0),
+                          ),
+                        ),
+                      ),
+                      SizedBox(height: 25),
+                      TextFormField(
+                        controller: _tanggalController,
+                        readOnly: true, // Set inputan tidak dapat diedit
+                        onTap: () {
+                          _selectDate(
+                              context); // Panggil metode untuk menampilkan date picker
+                        },
+                        decoration: InputDecoration(
+                          labelText: 'Tanggal Lahir (dd/mm/yyyy)',
+                          labelStyle: TextStyle(
+                            fontFamily: 'Poppins',
+                          ),
+                          enabledBorder: OutlineInputBorder(
+                            borderSide: BorderSide(color: Color(0xFF04558F)),
+                            borderRadius: BorderRadius.circular(8.0),
+                          ),
+                          focusedBorder: OutlineInputBorder(
+                            borderSide: BorderSide(color: Color(0xFF04558F)),
+                            borderRadius: BorderRadius.circular(8.0),
+                          ),
+                        ),
+                      ),
+
+                      SizedBox(height: 25),
+                      TextFormField(
+                        controller: _umurController,
+                        keyboardType: TextInputType.number,
+                        decoration: InputDecoration(
+                          labelText: 'Umurmu',
+                          labelStyle: TextStyle(
+                            fontFamily: 'Poppins',
+                          ),
+                          enabledBorder: OutlineInputBorder(
+                            borderSide: BorderSide(color: Color(0xFF04558F)),
+                            borderRadius: BorderRadius.circular(8.0),
+                          ),
+                          focusedBorder: OutlineInputBorder(
+                            borderSide: BorderSide(color: Color(0xFF04558F)),
+                            borderRadius: BorderRadius.circular(8.0),
+                          ),
+                        ),
+                      ),
+                      SizedBox(height: 25),
+                      DropdownButtonFormField(
                         value: _selectedAgama,
                         items: [
                           'Islam',
@@ -218,25 +299,6 @@ class _IntroductionPageState extends State<IntroductionPage> {
                           ),
                         ),
                       ),
-                      SizedBox(height: 25),
-                      TextFormField(
-                        controller: _umurController,
-                        keyboardType: TextInputType.number,
-                        decoration: InputDecoration(
-                          labelText: 'Umurmu',
-                          labelStyle: TextStyle(
-                            fontFamily: 'Poppins',
-                          ),
-                          enabledBorder: OutlineInputBorder(
-                            borderSide: BorderSide(color: Color(0xFF04558F)),
-                            borderRadius: BorderRadius.circular(8.0),
-                          ),
-                          focusedBorder: OutlineInputBorder(
-                            borderSide: BorderSide(color: Color(0xFF04558F)),
-                            borderRadius: BorderRadius.circular(8.0),
-                          ),
-                        ),
-                      ),
                     ],
                   ),
                 ),
@@ -256,13 +318,54 @@ class _IntroductionPageState extends State<IntroductionPage> {
     );
   }
 
+  Future<void> _selectDate(BuildContext context) async {
+    final DateTime? pickedDate = await showDatePicker(
+      context: context,
+      initialDate: DateTime.now(),
+      firstDate: DateTime(1900),
+      lastDate: DateTime.now(),
+      builder: (BuildContext context, Widget? child) {
+        return Theme(
+          data: ThemeData.light().copyWith(
+            colorScheme: ColorScheme.light().copyWith(
+              primary: Color(0xFF04558F), 
+            ),
+            textTheme: TextTheme(
+              bodyText1: TextStyle(
+                fontFamily: 'Poppins', 
+                fontSize: 14, 
+                color: Colors.black,
+              ),
+            ),
+          ),
+          child: child!,
+        );
+      },
+    );
+    if (pickedDate != null && pickedDate != DateTime.now()) {
+      setState(() {
+        _tanggalController.text = pickedDate.day.toString().padLeft(2, '0') +
+            '/' +
+            pickedDate.month.toString().padLeft(2, '0') +
+            '/' +
+            pickedDate.year.toString();
+      });
+    }
+  }
+
   void _saveDataToUsers() async {
     String nama = _namaController.text.trim();
     String agama = _selectedAgama;
     int umur;
+    String tanggal = _tanggalController.text.trim(); // Ambil nilai tanggal
+    String jenisKelamin = _selectedGender; // Ambil nilai jenis kelamin
 
-    // Validasi
-    if (nama.isEmpty || agama.isEmpty || _umurController.text.isEmpty) {
+    // Validasi form
+    if (nama.isEmpty ||
+        agama.isEmpty ||
+        _umurController.text.isEmpty ||
+        tanggal.isEmpty ||
+        jenisKelamin.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(
@@ -319,9 +422,11 @@ class _IntroductionPageState extends State<IntroductionPage> {
       String userId = FirebaseAuth.instance.currentUser!.uid;
       await FirebaseFirestore.instance.collection('Users').doc(userId).set({
         'nama': nama,
-        'email': _email, // Tambahkan field email
+        'email': _email, 
         'agama': agama,
         'umur': umur,
+        'tanggal_lahir': tanggal, 
+        'jenis_kelamin': jenisKelamin, 
       });
 
       // Arahkan ke halaman UserPage jika berhasil disimpan

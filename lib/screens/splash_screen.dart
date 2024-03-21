@@ -79,10 +79,19 @@ class _SplashScreenState extends State<SplashScreen> {
         }
       }
     } else if (loginStatus == 'user_google') {
-      // Navigasi ke halaman UserPage karena pengguna menggunakan Google Sign In
-      Navigator.of(context).pushReplacement(
-        MaterialPageRoute(builder: (context) => UserPage()),
-      );
+       bool isUserRegistered = await checkUserRegistrationStatus(userId);
+
+      if (isUserRegistered) {
+        // Navigasi ke halaman UserPage karena pengguna menggunakan Google Sign In dan terdaftar sebagai user
+        Navigator.of(context).pushReplacement(
+          MaterialPageRoute(builder: (context) => UserPage()),
+        );
+      } else {
+        // Pengguna tidak terdaftar, navigasi ke IntroductionPage
+        Navigator.of(context).pushReplacement(
+          MaterialPageRoute(builder: (context) => IntroductionPage()),
+        );
+      }
     } else {
       // Navigasi ke halaman LoginOption karena tidak dapat menentukan jenis login
       Navigator.of(context).pushReplacement(

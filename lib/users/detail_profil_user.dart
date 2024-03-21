@@ -14,6 +14,9 @@ class _DetailProfileUserState extends State<DetailProfileUser> {
   TextEditingController _emailController = TextEditingController();
   TextEditingController _agamaController = TextEditingController();
   TextEditingController _umurController = TextEditingController();
+  TextEditingController _jenisKelaminController = TextEditingController();
+  TextEditingController _tanggalLahirController = TextEditingController();
+
    bool _isModified = false;
 
   @override
@@ -28,6 +31,8 @@ class _DetailProfileUserState extends State<DetailProfileUser> {
           _emailController.text = userData['email'] ?? '';
           _agamaController.text = userData['agama'] ?? '';
           _umurController.text = userData['umur']?.toString() ?? '';
+          _jenisKelaminController.text = userData['jenis_kelamin'] ?? '';
+          _tanggalLahirController.text = userData['tanggal_lahir'] ?? '';
         });
       });
     }
@@ -85,6 +90,41 @@ class _DetailProfileUserState extends State<DetailProfileUser> {
     );
   }
 
+  Future<void> _selectDate(BuildContext context) async {
+    final DateTime? pickedDate = await showDatePicker(
+      context: context,
+      initialDate: DateTime.now(),
+      firstDate: DateTime(1900),
+      lastDate: DateTime.now(),
+      builder: (BuildContext context, Widget? child) {
+        return Theme(
+          data: ThemeData.light().copyWith(
+            colorScheme: ColorScheme.light().copyWith(
+              primary: Color(0xFF04558F),
+            ),
+            textTheme: TextTheme(
+              bodyText1: TextStyle(
+                fontFamily: 'Poppins',
+                fontSize: 14,
+                color: Colors.black,
+              ),
+            ),
+          ),
+          child: child!,
+        );
+      },
+    );
+    if (pickedDate != null && pickedDate != DateTime.now()) {
+      setState(() {
+        _tanggalLahirController.text = pickedDate.day.toString().padLeft(2, '0') +
+            '/' +
+            pickedDate.month.toString().padLeft(2, '0') +
+            '/' +
+            pickedDate.year.toString();
+      });
+    }
+  }
+
   // Fungsi untuk memperbarui data pengguna di Firestore
   Future<void> _updateUserData() async {
     final user = FirebaseAuth.instance.currentUser;
@@ -95,6 +135,8 @@ class _DetailProfileUserState extends State<DetailProfileUser> {
           .update({
         'nama': _namaController.text,
         'umur': int.parse(_umurController.text),
+        'jenis_kelamin': _jenisKelaminController.text,
+        'tanggal_lahir': _tanggalLahirController.text,
       });
       setState(() {
         _isModified = false;
@@ -109,6 +151,7 @@ class _DetailProfileUserState extends State<DetailProfileUser> {
               duration: Duration(seconds: 2),
             ),
       );
+      
     }
   }
 
@@ -123,7 +166,9 @@ class _DetailProfileUserState extends State<DetailProfileUser> {
         leading: IconButton(
           icon: Icon(Icons.arrow_back),
           onPressed: () {
-            Navigator.pop(context, _namaController.text);
+            Navigator.pop(context,
+            _namaController.text, 
+            );
           },
         ),
       ),
@@ -167,10 +212,15 @@ class _DetailProfileUserState extends State<DetailProfileUser> {
                       shape: BoxShape.circle,
                       color: Colors.green.shade600,
                     ),
-                    child: Icon(
-                      Icons.camera_alt,
-                      color: Colors.white,
-                      size: 20,
+                    child: IconButton(
+                      icon: Icon(
+                        Icons.camera_alt,
+                        color: Colors.white,
+                        size: 20,
+                      ),
+                      onPressed: () {
+                        _showBottomSheet();
+                      },
                     ),
                   ),
                 ],
@@ -196,13 +246,25 @@ class _DetailProfileUserState extends State<DetailProfileUser> {
               controller: _emailController,
               enabled: false,
             ),
-            SizedBox(height: 20),
-            // TextFormField untuk Agama
+            
+             SizedBox(height: 20),
+            // TextFormField untuk Jenis Kelamin
             _buildTextField(
-              hintText: 'Agama',
-              prefixIcon: Icons.sentiment_satisfied_alt,
-              controller: _agamaController,
+              hintText: 'Jenis Kelamin',
+              prefixIcon: Icons.person,
+              controller: _jenisKelaminController,
               enabled: false,
+            ),
+            SizedBox(height: 20),
+            // TextFormField untuk Tanggal Lahir
+            _buildTextField(
+              hintText: 'Tanggal Lahir',
+              prefixIcon: Icons.calendar_today,
+              controller: _tanggalLahirController,
+              enabled: true,
+              onTap: () {
+                _selectDate(context);
+              },
             ),
             SizedBox(height: 20),
             // TextFormField untuk Umur
@@ -216,6 +278,14 @@ class _DetailProfileUserState extends State<DetailProfileUser> {
                   _isModified = true;
                 });
               },
+            ),
+            SizedBox(height: 20),
+            // TextFormField untuk Agama
+            _buildTextField(
+              hintText: 'Agama',
+              prefixIcon: Icons.sentiment_satisfied_alt,
+              controller: _agamaController,
+              enabled: false,
             ),
             SizedBox(height: 20),
             // Tombol Simpan
@@ -248,6 +318,69 @@ class _DetailProfileUserState extends State<DetailProfileUser> {
     );
   }
 
+  void _showBottomSheet() {
+    showModalBottomSheet(
+      context: context,
+      builder: (BuildContext context) {
+        return Container(
+          padding: EdgeInsets.all(20),
+          child: Column(
+            mainAxisSize: MainAxisSize
+                .min, // Set agar ukuran bottom sheet sesuai dengan konten
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              InkWell(
+                onTap: () {
+                  // Implementasi ambil dari kamera
+                },
+                child: Row(
+                  children: [
+                    Image.asset(
+                      'images/kamera.png',
+                      width: 40,
+                      height: 40,
+                    ),
+                    SizedBox(width: 10),
+                    Text(
+                      'Ambil dari kamera',
+                      style: TextStyle(
+                        fontFamily: 'Poppins',
+                        fontSize: 16,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              SizedBox(height: 20),
+              InkWell(
+                onTap: () {
+                  // Implementasi ambil dari galeri
+                },
+                child: Row(
+                  children: [
+                    Image.asset(
+                      'images/galeri.png',
+                      width: 40,
+                      height: 40,
+                    ),
+                    SizedBox(width: 10),
+                    Text(
+                      'Ambil dari galeri',
+                      style: TextStyle(
+                        fontFamily: 'Poppins',
+                        fontSize: 16,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
   // Fungsi untuk membuat TextFormField
   Widget _buildTextField({
     required String hintText,
@@ -256,6 +389,7 @@ class _DetailProfileUserState extends State<DetailProfileUser> {
     TextInputType keyboardType = TextInputType.text,
     bool enabled = true,
     Function(String)? onChanged,
+    Function()? onTap,
   }) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -279,6 +413,7 @@ class _DetailProfileUserState extends State<DetailProfileUser> {
           ),
           controller: controller,
           onChanged: onChanged,
+          onTap: onTap,
           decoration: InputDecoration(
             hintText: hintText,
             prefixIcon: Icon(prefixIcon),
