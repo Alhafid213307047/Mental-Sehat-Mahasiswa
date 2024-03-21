@@ -17,6 +17,7 @@ class _ProfileUserPageState extends State<ProfileUserPage> {
   final GoogleSignIn googleSignIn = GoogleSignIn(scopes: ['email']);
    late String _userName = ''; // variabel untuk menyimpan nama pengguna
   late String _userEmail = ''; // variabel untuk menyimpan email pengguna
+  late String _profileImageUrl = ''; 
 
   @override
   void initState() {
@@ -40,6 +41,7 @@ class _ProfileUserPageState extends State<ProfileUserPage> {
       setState(() {
         _userName = userSnapshot['nama'];
         _userEmail = userSnapshot['email'];
+        _profileImageUrl = userSnapshot['image'] ?? '';
       });
     }
   }
@@ -66,14 +68,19 @@ class _ProfileUserPageState extends State<ProfileUserPage> {
   }
 
    Future<void> _navigateToDetailProfilePage() async {
-    final updatedName = await Navigator.push(
+    final updatedData = await Navigator.push(
       context,
       MaterialPageRoute(builder: (context) => DetailProfileUser()),
     );
 
-    if (updatedName != null) {
+    if (updatedData != null && updatedData is Map<String, dynamic>) {
       setState(() {
-        _userName = updatedName;
+        if (updatedData.containsKey('imageUrl')) {
+          _profileImageUrl = updatedData['imageUrl'];
+        }
+        if (updatedData.containsKey('name')) {
+          _userName = updatedData['name'];
+        }
       });
     }
   }
@@ -166,12 +173,21 @@ class _ProfileUserPageState extends State<ProfileUserPage> {
                         height: 60,
                         decoration: BoxDecoration(
                           shape: BoxShape.circle,
-                          image: DecorationImage(
-                            image: AssetImage('images/profil.jpg'),
-                            fit: BoxFit.cover,
-                          ),
+                        ),
+                        child: ClipRRect(
+                          borderRadius: BorderRadius.circular(60),
+                          child: _profileImageUrl.isNotEmpty
+                              ? Image.network(
+                                  _profileImageUrl,
+                                  fit: BoxFit.cover,
+                                )
+                              : Image.asset(
+                                  'images/profil.jpg',
+                                  fit: BoxFit.cover,
+                                ),
                         ),
                       ),
+
                       SizedBox(width: 20),
                       Column(
                         crossAxisAlignment: CrossAxisAlignment.start,

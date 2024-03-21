@@ -1,6 +1,10 @@
+import 'dart:io';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:image_picker/image_picker.dart';
+import 'package:firebase_storage/firebase_storage.dart' as firebase_storage;
 
 class DetailProfileUser extends StatefulWidget {
   const DetailProfileUser({super.key});
@@ -17,7 +21,8 @@ class _DetailProfileUserState extends State<DetailProfileUser> {
   TextEditingController _jenisKelaminController = TextEditingController();
   TextEditingController _tanggalLahirController = TextEditingController();
 
-   bool _isModified = false;
+  bool _isModified = false;
+  String? profileImageUrl;
 
   @override
   void initState() {
@@ -33,6 +38,7 @@ class _DetailProfileUserState extends State<DetailProfileUser> {
           _umurController.text = userData['umur']?.toString() ?? '';
           _jenisKelaminController.text = userData['jenis_kelamin'] ?? '';
           _tanggalLahirController.text = userData['tanggal_lahir'] ?? '';
+          profileImageUrl = userData['image'];
         });
       });
     }
@@ -53,32 +59,35 @@ class _DetailProfileUserState extends State<DetailProfileUser> {
           false, // Dialog tidak bisa ditutup dengan mengetuk di luar dialog
       builder: (BuildContext context) {
         return AlertDialog(
-          title: Text('Konfirmasi',
-          style: TextStyle(fontFamily: 'Poppins'),
+          title: Text(
+            'Konfirmasi',
+            style: TextStyle(fontFamily: 'Poppins'),
           ),
           content: SingleChildScrollView(
             child: ListBody(
               children: <Widget>[
-                Text('Apakah Anda ingin menyimpan perubahan?',
-                style: TextStyle(fontFamily: 'Poppins'),
+                Text(
+                  'Apakah Anda ingin menyimpan perubahan?',
+                  style: TextStyle(fontFamily: 'Poppins'),
                 ),
               ],
             ),
           ),
           actions: <Widget>[
             TextButton(
-              child: Text('Tidak',
-              style: TextStyle(fontFamily: 'Poppins'),
+              child: Text(
+                'Tidak',
+                style: TextStyle(fontFamily: 'Poppins'),
               ),
               onPressed: () {
                 Navigator.of(context).pop();
               },
             ),
             TextButton(
-              child: Text('Ya',
-              style: TextStyle(
-                fontFamily: 'Poppins'
-              ),),
+              child: Text(
+                'Ya',
+                style: TextStyle(fontFamily: 'Poppins'),
+              ),
               onPressed: () {
                 _updateUserData();
                 Navigator.of(context).pop();
@@ -116,11 +125,12 @@ class _DetailProfileUserState extends State<DetailProfileUser> {
     );
     if (pickedDate != null && pickedDate != DateTime.now()) {
       setState(() {
-        _tanggalLahirController.text = pickedDate.day.toString().padLeft(2, '0') +
-            '/' +
-            pickedDate.month.toString().padLeft(2, '0') +
-            '/' +
-            pickedDate.year.toString();
+        _tanggalLahirController.text =
+            pickedDate.day.toString().padLeft(2, '0') +
+                '/' +
+                pickedDate.month.toString().padLeft(2, '0') +
+                '/' +
+                pickedDate.year.toString();
       });
     }
   }
@@ -142,23 +152,22 @@ class _DetailProfileUserState extends State<DetailProfileUser> {
         _isModified = false;
       });
       ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text(
-                'Data berhasil diperbarui',
-                style: TextStyle(fontFamily: 'Poppins', color: Colors.white),
-              ),
-              backgroundColor: Colors.black,
-              duration: Duration(seconds: 2),
-            ),
+        SnackBar(
+          content: Text(
+            'Data berhasil diperbarui',
+            style: TextStyle(fontFamily: 'Poppins', color: Colors.white),
+          ),
+          backgroundColor: Colors.black,
+          duration: Duration(seconds: 2),
+        ),
       );
-      
     }
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-     appBar: AppBar(
+      appBar: AppBar(
         title: Text(
           'Profil Saya',
           style: TextStyle(fontFamily: 'Poppins', fontWeight: FontWeight.bold),
@@ -166,13 +175,13 @@ class _DetailProfileUserState extends State<DetailProfileUser> {
         leading: IconButton(
           icon: Icon(Icons.arrow_back),
           onPressed: () {
-            Navigator.pop(context,
-            _namaController.text, 
+            Navigator.pop(
+              context,
+              {'name': _namaController.text, 'imageUrl': profileImageUrl},
             );
           },
         ),
       ),
-
       body: SingleChildScrollView(
         padding: EdgeInsets.all(20.0),
         child: Column(
@@ -198,10 +207,15 @@ class _DetailProfileUserState extends State<DetailProfileUser> {
                     ),
                     child: ClipRRect(
                       borderRadius: BorderRadius.circular(60),
-                      child: Image.asset(
-                        'images/profil.jpg',
-                        fit: BoxFit.cover,
-                      ),
+                      child: profileImageUrl != null
+                          ? Image.network(
+                              profileImageUrl!,
+                              fit: BoxFit.cover,
+                            )
+                          : Image.asset(
+                              'images/profil.jpg',
+                              fit: BoxFit.cover,
+                            ),
                     ),
                   ),
                   Container(
@@ -246,8 +260,8 @@ class _DetailProfileUserState extends State<DetailProfileUser> {
               controller: _emailController,
               enabled: false,
             ),
-            
-             SizedBox(height: 20),
+
+            SizedBox(height: 20),
             // TextFormField untuk Jenis Kelamin
             _buildTextField(
               hintText: 'Jenis Kelamin',
@@ -290,7 +304,7 @@ class _DetailProfileUserState extends State<DetailProfileUser> {
             SizedBox(height: 20),
             // Tombol Simpan
             ElevatedButton(
-             onPressed: _isModified ? _showConfirmationDialog : null,
+              onPressed: _isModified ? _showConfirmationDialog : null,
               child: Container(
                 width: double.infinity,
                 child: Center(
@@ -353,8 +367,14 @@ class _DetailProfileUserState extends State<DetailProfileUser> {
               ),
               SizedBox(height: 20),
               InkWell(
-                onTap: () {
-                  // Implementasi ambil dari galeri
+                onTap: () async {
+                  final ImagePicker picker = ImagePicker();
+                  final XFile? imageFile =
+                      await picker.pickImage(source: ImageSource.gallery);
+                  if (imageFile != null) {
+                    // Panggil fungsi untuk mengunggah gambar
+                    _uploadImage(File(imageFile.path));
+                  }
                 },
                 child: Row(
                   children: [
@@ -379,6 +399,76 @@ class _DetailProfileUserState extends State<DetailProfileUser> {
         );
       },
     );
+  }
+
+  Future<void> _uploadImage(File imageFile) async {
+    try {
+      final user = FirebaseAuth.instance.currentUser;
+      if (user != null) {
+        final userData = await getUserData(user.uid);
+        String fileName = imageFile.path.split('/').last;
+
+        // Membuat referensi Firebase Storage
+        final ref = firebase_storage.FirebaseStorage.instance
+            .ref()
+            .child('profile_pictures')
+            .child(user.uid)
+            .child(fileName);
+
+        // Mengunggah gambar ke Firebase Storage
+        await ref.putFile(imageFile);
+
+        // Mendapatkan URL gambar yang telah diunggah
+        final imageUrl = await ref.getDownloadURL();
+
+        if (userData.containsKey('image')) {
+          // Jika sudah ada, gunakan update
+          await FirebaseFirestore.instance
+              .collection('Users')
+              .doc(user.uid)
+              .update({
+            'image': imageUrl,
+          });
+        } else {
+          // Jika belum ada, gunakan set
+          await FirebaseFirestore.instance.collection('Users').doc(user.uid).set(
+              {
+                'image': imageUrl,
+              },
+              SetOptions(merge:true)); // Gunakan SetOptions dengan merge true agar data yang ada tidak dihapus
+        }
+
+         setState(() {
+          // Update profileImageUrl dengan URL gambar baru
+          profileImageUrl = imageUrl;
+        });
+
+        Navigator.pop(context, imageUrl);
+
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(
+              'Gambar berhasil diunggah',
+              style: TextStyle(fontFamily: 'Poppins', color: Colors.white),
+            ),
+            backgroundColor: Colors.black,
+            duration: Duration(seconds: 2),
+          ),
+        );
+      }
+    } catch (error) {
+      print('Error uploading image: $error');
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            'Gagal mengunggah gambar',
+            style: TextStyle(fontFamily: 'Poppins', color: Colors.white),
+          ),
+          backgroundColor: Colors.red,
+          duration: Duration(seconds: 2),
+        ),
+      );
+    }
   }
 
   // Fungsi untuk membuat TextFormField
@@ -409,7 +499,7 @@ class _DetailProfileUserState extends State<DetailProfileUser> {
           readOnly: !enabled,
           style: TextStyle(
             fontFamily: 'Poppins',
-            color: enabled ? Colors.black : Colors.black, 
+            color: enabled ? Colors.black : Colors.black,
           ),
           controller: controller,
           onChanged: onChanged,
