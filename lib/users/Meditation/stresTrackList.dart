@@ -206,7 +206,7 @@ class _StresTrackListState extends State<StresTrackList> {
                 ),
                 SizedBox(height: 8),
                 Text(
-                  'Durasi: 3:57',
+                  'Durasi: 2.56',
                   style: TextStyle(
                     fontFamily: 'Poppins',
                     fontSize: 14,
