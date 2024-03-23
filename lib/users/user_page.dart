@@ -7,6 +7,7 @@ import 'package:google_sign_in/google_sign_in.dart';
 import 'package:mentalsehat/screens/login_option.dart';
 import 'package:mentalsehat/users/category_diagnosa_user.dart';
 import 'package:mentalsehat/users/Meditation/meditation_page.dart';
+import 'package:mentalsehat/users/panduan_page.dart';
 import 'package:mentalsehat/users/profil_user_page.dart';
 import 'package:mentalsehat/users/riwayat_diagnosa_page.dart';
 
@@ -389,7 +390,12 @@ class _UserPageContentState extends State<UserPageContent> {
                 );
               }),
               _buildCircularButton('images/panduan.png', 'Panduan', () {
-                _showComingSoonDialog('Panduan');
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => PanduanPage(),
+                  ),
+                );
               }),
             ],
           ),

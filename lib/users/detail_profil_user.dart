@@ -344,8 +344,12 @@ class _DetailProfileUserState extends State<DetailProfileUser> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               InkWell(
-                onTap: () {
-                  // Implementasi ambil dari kamera
+                onTap: () async {
+                  final picker = ImagePicker();
+                  final XFile? image = await picker.pickImage(source: ImageSource.camera);
+                  if (image != null) {
+                    _uploadImage(File(image.path));
+                  }
                 },
                 child: Row(
                   children: [

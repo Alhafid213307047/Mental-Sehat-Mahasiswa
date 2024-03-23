@@ -160,6 +160,22 @@ class _MeditationPageState extends State<MeditationPage> {
   }
 
   Widget _buildCategoryButton(String category, String label) {
+    String iconImage = '';
+    switch (category) {
+      case 'mindfulness':
+        iconImage = 'images/mind.png';
+        break;
+      case 'nature':
+        iconImage = 'images/nature.png';
+        break;
+      case 'religious':
+        iconImage = 'images/religius.png';
+        break;
+      default:
+        iconImage =
+            'images/default.png'; 
+    }
+
     return Padding(
       padding: const EdgeInsets.only(right: 8.0),
       child: ElevatedButton.icon(
@@ -168,10 +184,13 @@ class _MeditationPageState extends State<MeditationPage> {
             selectedCategory = category;
           });
         },
-        icon: Icon(Icons.ac_unit,
-            color: selectedCategory == category
-                ? Colors.white
-                : Color(0xFF04558F)),
+        icon: Image.asset(
+          iconImage,
+          width: 24, // Sesuaikan ukuran ikon sesuai kebutuhan
+          height: 24, // Sesuaikan ukuran ikon sesuai kebutuhan
+          color:
+              selectedCategory == category ? Colors.white : Color(0xFF04558F),
+        ),
         label: Text(
           label,
           style: TextStyle(
