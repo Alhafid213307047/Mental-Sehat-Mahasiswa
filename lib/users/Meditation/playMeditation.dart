@@ -26,11 +26,14 @@ class _PlayMeditationState extends State<PlayMeditation> {
   int currentIndex = 0;
   bool isAutoPlayEnabled = false;
   late String currentTrackTitle;
+  late String appBarTitle;
 
   @override
   void initState() {
     super.initState();
     currentIndex = widget.selectedIndex;
+    currentTrackTitle = widget.trackTitles[currentIndex];
+    appBarTitle = currentTrackTitle; 
 
     audioPlayer.isPlaying.listen((event) {
       setState(() {
@@ -54,8 +57,9 @@ class _PlayMeditationState extends State<PlayMeditation> {
       }
     });
 
-     audioPlayer.playlistAudioFinished.listen((audio) {
-      print("Index trek: $currentIndex, Judul trek: ${widget.trackTitles[currentIndex]}");
+    audioPlayer.playlistAudioFinished.listen((audio) {
+      print(
+          "Index trek: $currentIndex, Judul trek: ${widget.trackTitles[currentIndex]}");
       setState(() {
         if (audio.hasNext) {
           currentIndex++;
@@ -79,19 +83,71 @@ class _PlayMeditationState extends State<PlayMeditation> {
     }
   }
 
+  void _updateAppBarTitle() {
+    setState(() {
+      // Mengubah judul AppBar sesuai dengan trek audio yang sedang diputar
+      appBarTitle = currentTrackTitle;
+    });
+  }
+
   void _continueAutomatically() {
     if (currentIndex <= widget.audioPaths.length - 1) {
       if (!audioPlayer.isPlaying.value) {
         // Periksa apakah audio saat ini telah selesai
         currentIndex++;
-         setState(() {
+        setState(() {
           currentTrackTitle = widget.trackTitles[currentIndex];
         });
         audioPlayer.open(Audio(widget.audioPaths[currentIndex]),
             autoStart: true);
+            _updateAppBarTitle();
       }
     } else {
       audioPlayer.stop();
+    }
+  }
+
+  void _skipNext() {
+    if (currentIndex < widget.audioPaths.length - 1) {
+      // Cek apakah masih ada trek berikutnya dalam daftar
+      currentIndex++;
+      setState(() {
+        currentTrackTitle = widget.trackTitles[currentIndex];
+      });
+      audioPlayer.open(Audio(widget.audioPaths[currentIndex]), autoStart: true);
+      _updateAppBarTitle();
+    } else {
+      // Jika tidak ada trek berikutnya, tampilkan snackbar
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            'Ini adalah trek terakhir dalam daftar',
+            style: TextStyle(fontFamily: 'Poppins'),
+          ),
+        ),
+      );
+    }
+  }
+
+  void _skipPrevious() {
+    if (currentIndex > 0) {
+      // Cek apakah masih ada trek sebelumnya dalam daftar
+      currentIndex--;
+      setState(() {
+        currentTrackTitle = widget.trackTitles[currentIndex];
+      });
+      audioPlayer.open(Audio(widget.audioPaths[currentIndex]), autoStart: true);
+      _updateAppBarTitle();
+    } else {
+      // Jika tidak ada trek sebelumnya, tampilkan snackbar
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            'Ini adalah trek pertama dalam daftar',
+            style: TextStyle(fontFamily: 'Poppins'),
+          ),
+        ),
+      );
     }
   }
 
@@ -128,7 +184,7 @@ class _PlayMeditationState extends State<PlayMeditation> {
       child: Scaffold(
         appBar: AppBar(
           title: Text(
-            widget.trackTitles[widget.selectedIndex],
+            appBarTitle,
             style: TextStyle(
               fontFamily: 'Poppins',
               fontWeight: FontWeight.bold,
@@ -246,14 +302,14 @@ class _PlayMeditationState extends State<PlayMeditation> {
   Widget _buildAudioControlButtons() {
     return Row(mainAxisAlignment: MainAxisAlignment.center, children: [
       _buildCircularIconButton(Icons.skip_previous, () {
-        // Tambahkan logika untuk trek sebelumnya
+        _skipPrevious();
       }),
       _buildCircularIconButton(
         isPlaying ? Icons.pause : Icons.play_arrow,
         _playPause,
       ),
       _buildCircularIconButton(Icons.skip_next, () {
-        _continueAutomatically();
+        _skipNext();
       }),
       _buildCircularIconButton(Icons.refresh, _toggleAutoPlay,
           iconColor: isAutoPlayEnabled ? Color(0xFF04558F) : Colors.grey),
