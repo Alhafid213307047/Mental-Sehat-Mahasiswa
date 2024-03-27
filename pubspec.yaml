@@ -67,7 +67,8 @@ flutter:
     - images/panduan/
     - assets/audios/
     - assets/audios/religius/
-    - assets/audios/suaraAlam/
+    - assets/audios/suaraAlam/hujan/
+    - assets/audios/suaraAlam/burung/
     - assets/audios/mindfulness/stres/
   #   - images/a_dot_ham.jpeg
   # An image asset can refer to one or more resolution-specific "variants", see

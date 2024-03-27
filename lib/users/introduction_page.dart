@@ -16,12 +16,12 @@ class IntroductionPage extends StatefulWidget {
 class _IntroductionPageState extends State<IntroductionPage> {
   String _selectedAgama = 'Islam';
   TextEditingController _namaController = TextEditingController();
-  TextEditingController _umurController = TextEditingController();
   TextEditingController _tanggalController = TextEditingController();
   String _selectedGender = '';
   String _email = '';
   final Connectivity _connectivity = Connectivity();
   late StreamSubscription<ConnectivityResult> _connectivitySubscription;
+  DateTime? _selectedDate;
 
   @override
   void initState() {
@@ -240,26 +240,6 @@ class _IntroductionPageState extends State<IntroductionPage> {
                           ),
                         ),
                       ),
-
-                      SizedBox(height: 25),
-                      TextFormField(
-                        controller: _umurController,
-                        keyboardType: TextInputType.number,
-                        decoration: InputDecoration(
-                          labelText: 'Umurmu',
-                          labelStyle: TextStyle(
-                            fontFamily: 'Poppins',
-                          ),
-                          enabledBorder: OutlineInputBorder(
-                            borderSide: BorderSide(color: Color(0xFF04558F)),
-                            borderRadius: BorderRadius.circular(8.0),
-                          ),
-                          focusedBorder: OutlineInputBorder(
-                            borderSide: BorderSide(color: Color(0xFF04558F)),
-                            borderRadius: BorderRadius.circular(8.0),
-                          ),
-                        ),
-                      ),
                       SizedBox(height: 25),
                       DropdownButtonFormField(
                         value: _selectedAgama,
@@ -318,22 +298,23 @@ class _IntroductionPageState extends State<IntroductionPage> {
     );
   }
 
+ // Fungsi untuk memilih tanggal
   Future<void> _selectDate(BuildContext context) async {
     final DateTime? pickedDate = await showDatePicker(
       context: context,
-      initialDate: DateTime.now(),
+      initialDate: _selectedDate ?? DateTime.now(),
       firstDate: DateTime(1900),
       lastDate: DateTime.now(),
       builder: (BuildContext context, Widget? child) {
         return Theme(
           data: ThemeData.light().copyWith(
             colorScheme: ColorScheme.light().copyWith(
-              primary: Color(0xFF04558F), 
+              primary: Color(0xFF04558F),
             ),
             textTheme: TextTheme(
               bodyText1: TextStyle(
-                fontFamily: 'Poppins', 
-                fontSize: 14, 
+                fontFamily: 'Poppins',
+                fontSize: 14,
                 color: Colors.black,
               ),
             ),
@@ -342,66 +323,38 @@ class _IntroductionPageState extends State<IntroductionPage> {
         );
       },
     );
-    if (pickedDate != null && pickedDate != DateTime.now()) {
+
+    if (pickedDate != null) {
       setState(() {
-        _tanggalController.text = pickedDate.day.toString().padLeft(2, '0') +
-            '/' +
-            pickedDate.month.toString().padLeft(2, '0') +
-            '/' +
-            pickedDate.year.toString();
+        _selectedDate = pickedDate;
+        // Perbarui nilai _tanggalController dengan tanggal yang dipilih
+        _tanggalController.text =
+            "${pickedDate.day.toString().padLeft(2, '0')}/${pickedDate.month.toString().padLeft(2, '0')}/${pickedDate.year}";
       });
     }
   }
 
+// Fungsi untuk menyimpan data
   void _saveDataToUsers() async {
     String nama = _namaController.text.trim();
     String agama = _selectedAgama;
-    int umur;
-    String tanggal = _tanggalController.text.trim(); // Ambil nilai tanggal
-    String jenisKelamin = _selectedGender; // Ambil nilai jenis kelamin
+    String? tanggal = _tanggalController.text.trim(); // Biarkan sebagai String
 
-    // Validasi form
-    if (nama.isEmpty ||
-        agama.isEmpty ||
-        _umurController.text.isEmpty ||
-        tanggal.isEmpty ||
-        jenisKelamin.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(
-            'Harap isi semua kolom',
-            style: TextStyle(
-              fontFamily: 'Poppins',
-              color: Colors.white,
-            ),
-          ),
-          duration: Duration(seconds: 2),
-          backgroundColor: Colors.red,
-        ),
-      );
-      return;
+    // Validasi input
+
+    // Konversi tanggal ke DateTime
+    DateTime? birthDate = _selectedDate;
+
+    // Hitung usia
+    DateTime now = DateTime.now();
+    int age = now.year - birthDate!.year;
+    if (now.month < birthDate.month ||
+        (now.month == birthDate.month && now.day < birthDate.day)) {
+      age--;
     }
+    int umur = age;
 
-    // Konversi umur ke integer
-    umur = int.tryParse(_umurController.text) ?? 0;
-    if (umur <= 14) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(
-            'Umur harus lebih dari 14 tahun',
-            style: TextStyle(
-              fontFamily: 'Poppins',
-              color: Colors.white,
-            ),
-          ),
-          duration: Duration(seconds: 2),
-          backgroundColor: Colors.red,
-        ),
-      );
-      return;
-    }
-
-    // Tampilkan indikator loading selama 2 detik
+    // Tampilkan indikator loading
     showDialog(
       context: context,
       builder: (BuildContext context) {
@@ -411,37 +364,31 @@ class _IntroductionPageState extends State<IntroductionPage> {
       },
     );
 
-    // Tunggu 2 detik menggunakan Future.delayed
-    await Future.delayed(Duration(seconds: 2));
-
-    // Hapus indikator loading
-    Navigator.pop(context);
-
     try {
       // Simpan data ke Firestore
       String userId = FirebaseAuth.instance.currentUser!.uid;
       await FirebaseFirestore.instance.collection('Users').doc(userId).set({
         'nama': nama,
-        'email': _email, 
+        'email': _email,
         'agama': agama,
         'umur': umur,
-        'tanggal_lahir': tanggal, 
-        'jenis_kelamin': jenisKelamin, 
+        'tanggal_lahir': tanggal,
+        'jenis_kelamin': _selectedGender,
       });
 
-      // Arahkan ke halaman UserPage jika berhasil disimpan
+      // Arahkan ke halaman UserPage
       Navigator.pushReplacement(
         context,
         MaterialPageRoute(builder: (context) => UserPage()),
       );
     } catch (e) {
       print('Error saat menyimpan data ke Firestore: $e');
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('Gagal menyimpan data. Silakan coba lagi.'),
-          duration: Duration(seconds: 2),
-        ),
-      );
+      // Tangani kesalahan
     }
   }
+
+
+
+
+
 }

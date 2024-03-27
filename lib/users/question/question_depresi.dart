@@ -287,20 +287,23 @@ class _QuestionDepresiState extends State<QuestionDepresi> {
               },
               style: ElevatedButton.styleFrom(
                 primary: _selectedAnswers[_currentQuestion] == 0
-                    ? Colors.blue
-                    : Colors.white,
+                    ? Color(0xFF04558F)
+                    : Colors.white70,
+                     minimumSize: Size(double.infinity, 65),
+                     side: BorderSide(color: Colors.black),
               ),
               child: Text(
                 'Tidak pernah',
                 style: TextStyle(
                   fontFamily: 'Poppins',
+                  fontSize: 18,
                   color: _selectedAnswers[_currentQuestion] == 0
                       ? Colors.white
                       : null,
                 ),
               ),
             ),
-            SizedBox(height: 12),
+            SizedBox(height: 20),
             ElevatedButton(
               onPressed: () {
                 _selectAnswer(1); // Jawaban "Kadang-kadang" dengan nilai 1
@@ -308,20 +311,23 @@ class _QuestionDepresiState extends State<QuestionDepresi> {
               },
               style: ElevatedButton.styleFrom(
                 primary: _selectedAnswers[_currentQuestion] == 1
-                    ? Colors.blue
-                    : Colors.white,
+                    ? Color(0xFF04558F)
+                   : Colors.white70,
+                    minimumSize: Size(double.infinity, 65),
+                    side: BorderSide(color: Colors.black),
               ),
               child: Text(
                 'Kadang-kadang',
                 style: TextStyle(
                   fontFamily: 'Poppins',
+                  fontSize: 18,
                   color: _selectedAnswers[_currentQuestion] == 1
                       ? Colors.white
                       : null,
                 ),
               ),
             ),
-            SizedBox(height: 12),
+            SizedBox(height: 20),
             ElevatedButton(
               onPressed: () {
                 _selectAnswer(2); // Jawaban "Cukup sering" dengan nilai 2
@@ -329,20 +335,23 @@ class _QuestionDepresiState extends State<QuestionDepresi> {
               },
               style: ElevatedButton.styleFrom(
                 primary: _selectedAnswers[_currentQuestion] == 2
-                    ? Colors.blue
-                    : Colors.white,
+                    ? Color(0xFF04558F)
+                    : Colors.white70,
+                    minimumSize: Size(double.infinity, 65),
+                side: BorderSide(color: Colors.black),
               ),
               child: Text(
                 'Cukup sering',
                 style: TextStyle(
                   fontFamily: 'Poppins',
+                  fontSize: 18,
                   color: _selectedAnswers[_currentQuestion] == 2
                       ? Colors.white
                       : null,
                 ),
               ),
             ),
-            SizedBox(height: 12),
+            SizedBox(height: 20),
             ElevatedButton(
               onPressed: () {
                 _selectAnswer(3); // Jawaban "Sangat sering" dengan nilai 3
@@ -350,13 +359,16 @@ class _QuestionDepresiState extends State<QuestionDepresi> {
               },
               style: ElevatedButton.styleFrom(
                 primary: _selectedAnswers[_currentQuestion] == 3
-                    ? Colors.blue
-                    : Colors.white,
+                    ? Color(0xFF04558F)
+                    : Colors.white70,
+                    minimumSize: Size(double.infinity, 65),
+                side: BorderSide(color: Colors.black),
               ),
               child: Text(
                 'Sangat sering',
                 style: TextStyle(
                   fontFamily: 'Poppins',
+                  fontSize: 18,
                   color: _selectedAnswers[_currentQuestion] == 3
                       ? Colors.white
                       : null,

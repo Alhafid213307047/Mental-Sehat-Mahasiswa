@@ -152,6 +152,13 @@ class _LoginOptionState extends State<LoginOption> {
         password: _passwordController.text,
       );
 
+      // Mengecek apakah email pengguna sudah diverifikasi
+      if (!userCredential.user!.emailVerified) {
+        showErrorSnackbar(
+            'Email anda belum terverifikasi. Silahkan cek email anda untuk verifikasi terlebih dahulu');
+        return;
+      }
+
       // Mendapatkan UID pengguna yang berhasil masuk
       String userId = userCredential.user!.uid;
 

@@ -60,6 +60,8 @@ class _StressDiagnosisResultsState extends State<StressDiagnosisResults> {
       return "Stres Sangat Parah";
     }
   }
+  
+  
 
   String _getSolution() {
     String resultCategory = _getResultCategory();
@@ -281,6 +283,29 @@ class _StressDiagnosisResultsState extends State<StressDiagnosisResults> {
   }
 
   Widget _buildStresDiagnosisResult() {
+    String resultCategory = _getResultCategory();
+    String imagePath = '';
+
+    switch (resultCategory) {
+      case "Normal":
+        imagePath = 'images/stres_normal.png';
+        break;
+      case "Stres Ringan":
+        imagePath = 'images/stres_ringan.png';
+        break;
+      case "Stres Sedang":
+        imagePath = 'images/stres_sedang.png';
+        break;
+      case "Stres Parah":
+        imagePath = 'images/stres_parah.png';
+        break;
+      case "Stres Sangat Parah":
+        imagePath = 'images/stres_sangatparah.png';
+        break;
+      default:
+        break;
+    }
+
     return Scaffold(
       appBar: AppBar(
         title: Text(
@@ -318,7 +343,7 @@ class _StressDiagnosisResultsState extends State<StressDiagnosisResults> {
               ),
               SizedBox(height: 16),
               Image.asset(
-                'images/stres.png',
+                imagePath,
                 width: 150,
                 height: 150,
               ),

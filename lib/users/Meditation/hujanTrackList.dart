@@ -132,7 +132,7 @@ class _HujanTrackListState extends State<HujanTrackList> {
                 context,
                 'Rintik Hujan Gerimis',
                 'images/hujan.png',
-                'assets/audios/suaraAlam/rintik_hujan_gerimis.mp3',
+                'assets/audios/suaraAlam/hujan/rintik_hujan_gerimis.mp3',
                 '30.03',
                 0
               ),
@@ -140,7 +140,7 @@ class _HujanTrackListState extends State<HujanTrackList> {
                 context,
                 'Hujan dan Gemuruh',
                 'images/hujan.png',
-                'assets/audios/suaraAlam/hujan_gemuruh.mp3',
+                'assets/audios/suaraAlam/hujan/hujan_gemuruh.mp3',
                 '18.01',
                 1,
               ),
@@ -168,8 +168,8 @@ class _HujanTrackListState extends State<HujanTrackList> {
               title: title,
               imageAsset: imageAsset,
               audioPaths: [
-                'assets/audios/suaraAlam/rintik_hujan_gerimis.mp3',
-                'assets/audios/suaraAlam/hujan_gemuruh.mp3',
+                'assets/audios/suaraAlam/hujan/rintik_hujan_gerimis.mp3',
+                'assets/audios/suaraAlam/hujan/hujan_gemuruh.mp3',
               ],
               trackTitles: [
               'Rintik Hujan Gerimis',

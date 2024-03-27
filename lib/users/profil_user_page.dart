@@ -238,10 +238,10 @@ class _ProfileUserPageState extends State<ProfileUserPage> {
             SizedBox(height: 20),
             Row(
               children: [
-                Icon(Icons.credit_card), // Icon kredit
+                Icon(Icons.support), 
                 SizedBox(width: 10),
                 Text(
-                  'Kredit',
+                  'Dukungan',
                   style: TextStyle(
                     fontFamily: 'Poppins',
                     fontSize: 16,

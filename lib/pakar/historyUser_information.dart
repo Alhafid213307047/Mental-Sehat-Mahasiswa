@@ -149,12 +149,18 @@ class _HistoryUserInformationState extends State<HistoryUserInformation> {
                           height: 60,
                           decoration: BoxDecoration(
                             shape: BoxShape.circle,
-                            image: DecorationImage(
-                              image: AssetImage('images/profil.jpg'),
+                          ),
+                          child: ClipRRect(
+                            borderRadius: BorderRadius.circular(30),
+                            child: Image.network(
+                              userData['profileImageUrl'] != null
+                                  ? userData['profileImageUrl']
+                                  : 'images/profil.jpg', 
                               fit: BoxFit.cover,
                             ),
                           ),
                         ),
+
                         SizedBox(width: 10),
                         Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
@@ -199,11 +205,13 @@ class _HistoryUserInformationState extends State<HistoryUserInformation> {
         String id = doc.id;
         String name = doc['nama'] ?? 'Nama Tidak Tersedia';
         String email = doc['email'] ?? 'Email Tidak Tersedia';
+        String profileImageUrl = doc['image'] ?? ''; 
 
         Map<String, dynamic> userData = {
           'id': id,
           'name': name,
           'email': email,
+          'profileImageUrl': profileImageUrl,
         };
 
         usersData.add(userData);

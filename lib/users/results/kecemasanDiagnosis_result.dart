@@ -279,6 +279,29 @@ class _KecemasanDiagnosisResultState extends State<KecemasanDiagnosisResults> {
   }
 
   Widget _buildKecemasanDiagnosisResult() {
+    String resultCategory = _getResultCategory();
+    String imagePath = '';
+
+    switch (resultCategory) {
+      case "Normal":
+        imagePath = 'images/kecemasan_normal.png';
+        break;
+      case "Kecemasan Ringan":
+        imagePath = 'images/kecemasan_ringan.png';
+        break;
+      case "Kecemasan Sedang":
+        imagePath = 'images/kecemasan_sedang.png';
+        break;
+      case "Kecemasan Parah":
+        imagePath = 'images/kecemasan_parah.png';
+        break;
+      case "Kecemasan Sangat Parah":
+        imagePath = 'images/kecemasan_sangatparah.png';
+        break;
+      default:
+        break;
+    }
+
     return Scaffold(
       appBar: AppBar(
         title: Text(
@@ -316,7 +339,7 @@ class _KecemasanDiagnosisResultState extends State<KecemasanDiagnosisResults> {
               ),
               SizedBox(height: 16),
               Image.asset(
-                'images/kecemasan.png',
+                imagePath,
                 width: 150,
                 height: 150,
               ),

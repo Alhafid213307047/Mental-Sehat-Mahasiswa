@@ -1,8 +1,11 @@
 import 'dart:async';
 
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:connectivity_plus/connectivity_plus.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:mentalsehat/users/Meditation/ReligiousTrackList.dart';
+import 'package:mentalsehat/users/Meditation/burungTrackList.dart';
 import 'package:mentalsehat/users/Meditation/hujanTrackList.dart';
 import 'package:mentalsehat/users/Meditation/stresTrackList.dart';
 
@@ -126,7 +129,27 @@ class _MeditationPageState extends State<MeditationPage> {
                 children: [
                   _buildCategoryButton('mindfulness', 'Mindfulness'),
                   _buildCategoryButton('nature', 'Suara Alam'),
-                  _buildCategoryButton('religious', 'Trek Religius'),
+                  FutureBuilder<bool>(
+                    future: _isUserIslam(),
+                    builder: (context, snapshot) {
+                      if (snapshot.connectionState == ConnectionState.waiting) {
+                        return Container(); // Menampilkan tombol ketika tunggu hasil
+                      } else {
+                        if (snapshot.hasError) {
+                          // Tangani kesalahan jika ada
+                          return Text('Error: ${snapshot.error}');
+                        } else {
+                          final bool isUserIslam = snapshot.data ?? false;
+                          if (isUserIslam) {
+                            return _buildCategoryButton(
+                                'religious', 'Trek Religius');
+                          } else {
+                            return Container(); // Tidak menampilkan tombol jika bukan Islam
+                          }
+                        }
+                      }
+                    },
+                  ),
                 ],
               ),
             ),
@@ -251,49 +274,79 @@ class _MeditationPageState extends State<MeditationPage> {
   }
 
   Widget _buildNatureContent() {
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 6, right: 12, left: 8),
-      child: GestureDetector(
-        onTap: () {
-          Navigator.push(
-            context,
-            MaterialPageRoute(builder: (context) => HujanTrackList()),
-          );
-        },
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            SizedBox(height: 16),
-            Container(
-              width: 80,
-              height: 80,
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(8),
-                color: Colors.grey[200],
-              ),
-              margin: EdgeInsets.only(left: 8),
-              child: Image.asset(
-                'images/hujan.png', 
-                width: 50,
-                height: 50,
-                fit: BoxFit.cover,
-              ),
+  return Padding(
+      padding: const EdgeInsets.only(bottom: 6, right: 12, left: 8,top: 15),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          GestureDetector(
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => HujanTrackList()),
+              );
+            },
+            child: _buildColumnItem(
+              'images/hujan.png',
+              'Suara Hujan',
             ),
-            SizedBox(height: 8),
-            Padding(
-              padding: const EdgeInsets.only(left: 9),
-              child: Text(
-                'Suara Hujan',
-                style: TextStyle(
-                  fontFamily: 'Poppins',
-                  fontSize: 13,
-                  color: Colors.black,
-                ),
-              ),
+          ),
+          GestureDetector(
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => BurungTrackList()),
+              );
+            },
+            child: _buildColumnItem(
+              'images/burung.jpg',
+              'Kicauan Burung',
             ),
-          ],
-        ),
+          ),
+          GestureDetector(
+            onTap: () {
+              //
+            },
+            child: _buildColumnItem(
+              'images/ombak.jpg',
+              'Suara Ombak',
+            ),
+          ),
+        ],
       ),
+    );
+  }
+
+  Widget _buildColumnItem(String imagePath, String title) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment
+          .center, // Menjadikan konten vertikal berada di tengah
+      children: [
+        Container(
+          width: 80,
+          height: 80,
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(8),
+            color: Colors.grey[200],
+          ),
+          margin: EdgeInsets.only(left: 8),
+          child: Image.asset(
+            imagePath,
+            width: 50,
+            height: 50,
+            fit: BoxFit.cover,
+          ),
+        ),
+        SizedBox(height: 8),
+        Text(
+          title,
+          style: TextStyle(
+            fontFamily: 'Poppins',
+            fontSize: 13,
+            color: Colors.black,
+          ),
+        ),
+      ],
     );
   }
 
@@ -339,6 +392,26 @@ class _MeditationPageState extends State<MeditationPage> {
         ),
       ),
     );
+  }
+
+  Future<bool> _isUserIslam() async {
+    try {
+      // Ambil ID pengguna yang sedang login
+      String userId = FirebaseAuth.instance.currentUser!.uid;
+      // Ambil data pengguna dari Firestore
+      DocumentSnapshot userSnapshot = await FirebaseFirestore.instance
+          .collection('Users')
+          .doc(userId)
+          .get();
+      // Ambil nilai field agama dari data pengguna
+      String userReligion = userSnapshot['agama'];
+      // Kembalikan true jika agama pengguna adalah Islam, dan false jika tidak
+      return userReligion == 'Islam';
+    } catch (e) {
+      // Tangani kesalahan dengan mencetak atau menangani sesuai kebutuhan aplikasi Anda
+      print('Error checking user religion: $e');
+      return false; // Secara default, kembalikan false jika terjadi kesalahan
+    }
   }
 
 }

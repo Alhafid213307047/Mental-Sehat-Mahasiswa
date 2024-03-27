@@ -276,6 +276,29 @@ class _DepresiDiagnosisResultsState extends State<DepresiDiagnosisResults> {
   }
 
   Widget _buildDepresiDiagnosaResult() {
+    String resultCategory = _getResultCategory();
+    String imagePath = '';
+
+    switch (resultCategory) {
+      case "Normal":
+        imagePath = 'images/depresi_normal.png';
+        break;
+      case "Depresi Ringan":
+        imagePath = 'images/depresi_ringan.png';
+        break;
+      case "Depresi Sedang":
+        imagePath = 'images/depresi_sedang.png';
+        break;
+      case "Depresi Parah":
+        imagePath = 'images/depresi_parah.png';
+        break;
+      case "Depresi Sangat Parah":
+        imagePath = 'images/depresi_sangatparah.png';
+        break;
+      default:
+        break;
+    }
+
     return Scaffold(
       appBar: AppBar(
         title: Text(
@@ -313,7 +336,7 @@ class _DepresiDiagnosisResultsState extends State<DepresiDiagnosisResults> {
               ),
               SizedBox(height: 16),
               Image.asset(
-                'images/depresi.png',
+                imagePath,
                 width: 150,
                 height: 150,
               ),

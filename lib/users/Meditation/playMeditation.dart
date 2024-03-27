@@ -27,6 +27,7 @@ class _PlayMeditationState extends State<PlayMeditation> {
   bool isAutoPlayEnabled = false;
   late String currentTrackTitle;
   late String appBarTitle;
+  late String backgroundImage;
 
   @override
   void initState() {
@@ -34,6 +35,17 @@ class _PlayMeditationState extends State<PlayMeditation> {
     currentIndex = widget.selectedIndex;
     currentTrackTitle = widget.trackTitles[currentIndex];
     appBarTitle = currentTrackTitle; 
+    // Determine background image based on audioPath
+    if (widget.audioPaths.any((path) => path.contains('mindfulness'))) {
+      backgroundImage = 'images/weather_animation.gif';
+    } else if (widget.audioPaths.any((path) => path.contains('suaraAlam')) &&
+        widget.audioPaths.any((path) => path.contains('hujan'))) {
+      backgroundImage = 'images/rain_animation.gif';
+    } else {
+      // Default background image if no condition is met
+      backgroundImage = 'images/default_background.gif';
+    }
+
 
     audioPlayer.isPlaying.listen((event) {
       setState(() {
@@ -182,98 +194,109 @@ class _PlayMeditationState extends State<PlayMeditation> {
         return false;
       },
       child: Scaffold(
-        appBar: AppBar(
-          title: Text(
-            appBarTitle,
-            style: TextStyle(
-              fontFamily: 'Poppins',
-              fontWeight: FontWeight.bold,
+        body: Container(
+          decoration: BoxDecoration(
+            image: DecorationImage(
+              image: AssetImage(backgroundImage),
+              fit: BoxFit.cover,
             ),
           ),
-          leading: IconButton(
-            icon: Icon(Icons.arrow_back),
-            onPressed: () {
-              audioPlayer.stop();
-              Navigator.pop(context);
-            },
-          ),
-        ),
-        body: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: [
-            Expanded(
-              child: Center(
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  children: [
-                    SizedBox(height: 16),
-                    Image.asset(
-                      widget.imageAsset,
-                      width: 150,
-                      height: 150,
-                    ),
-                    SizedBox(height: 16),
-                  ],
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              Expanded(
+                child: Center(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      SizedBox(height: 16),
+                      Image.asset(
+                        widget.imageAsset,
+                        width: 150,
+                        height: 150,
+                      ),
+                      SizedBox(height: 16),
+                      Text(
+                        appBarTitle,
+                        style: TextStyle(
+                          fontFamily: 'Poppins',
+                          fontWeight: FontWeight.bold,
+                          fontSize: 18,
+                          color: backgroundImage == 'images/rain_animation.gif'
+                              ? Colors.white
+                              : null,
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
               ),
-            ),
-            if (audioPlayer.currentPosition.hasValue &&
-                audioPlayer.current.hasValue &&
-                audioPlayer.current.value != null)
-              Column(
-                children: [
-                  Padding(
-                    padding: const EdgeInsets.all(16.0),
-                    child: LinearProgressIndicator(
-                      value: audioPlayer.currentPosition.value.inMilliseconds /
-                          (audioPlayer.current.value!.audio.duration
-                                      .inMilliseconds ==
-                                  0
-                              ? 1
-                              : audioPlayer.current.value!.audio.duration
-                                  .inMilliseconds),
-                      minHeight: 5,
-                      backgroundColor: Colors.grey[300],
-                      valueColor: AlwaysStoppedAnimation<Color>(Colors.blue),
+              if (audioPlayer.currentPosition.hasValue &&
+                  audioPlayer.current.hasValue &&
+                  audioPlayer.current.value != null)
+                Column(
+                  children: [
+                    Padding(
+                      padding: const EdgeInsets.all(16.0),
+                      child: LinearProgressIndicator(
+                        value: audioPlayer.currentPosition.value.inMilliseconds /
+                            (audioPlayer.current.value!.audio.duration
+                                        .inMilliseconds ==
+                                    0
+                                ? 1
+                                : audioPlayer.current.value!.audio.duration
+                                    .inMilliseconds),
+                        minHeight: 5,
+                        backgroundColor: Colors.grey[300],
+                        valueColor: AlwaysStoppedAnimation<Color>(Colors.blue),
+                      ),
                     ),
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 16.0),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Text(
-                          '${audioPlayer.currentPosition.value.inMinutes}:${(audioPlayer.currentPosition.value.inSeconds % 60).toString().padLeft(2, '0')}',
-                          style: TextStyle(
-                            fontFamily: 'Poppins',
-                            fontSize: 16,
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Text(
+                            '${audioPlayer.currentPosition.value.inMinutes}:${(audioPlayer.currentPosition.value.inSeconds % 60).toString().padLeft(2, '0')}',
+                            style: TextStyle(
+                              fontFamily: 'Poppins',
+                              fontSize: 16,
+                              color:
+                                  backgroundImage == 'images/rain_animation.gif'
+                                      ? Colors.white
+                                      : null,
+                            ),
                           ),
-                        ),
-                        Text(
-                          '${audioPlayer.current.value!.audio.duration.inMinutes}:${(audioPlayer.current.value!.audio.duration.inSeconds % 60).toString().padLeft(2, '0')}',
-                          style: TextStyle(
-                            fontFamily: 'Poppins',
-                            fontSize: 16,
+                          Text(
+                            '${audioPlayer.current.value!.audio.duration.inMinutes}:${(audioPlayer.current.value!.audio.duration.inSeconds % 60).toString().padLeft(2, '0')}',
+                            style: TextStyle(
+                              fontFamily: 'Poppins',
+                              fontSize: 16,
+                              color:
+                                  backgroundImage == 'images/rain_animation.gif'
+                                      ? Colors.white
+                                      : null,
+                            ),
                           ),
-                        ),
-                      ],
+                        ],
+                      ),
                     ),
-                  ),
-                ],
+                  ],
+                ),
+              Padding(
+                padding: const EdgeInsets.all(16.0),
+                child: PlayerBuilder.isPlaying(
+                  player: audioPlayer,
+                  builder: (context, isPlaying) {
+                    this.isPlaying = isPlaying;
+                    return _buildAudioControlButtons();
+                  },
+                ),
               ),
-            Padding(
-              padding: const EdgeInsets.all(16.0),
-              child: PlayerBuilder.isPlaying(
-                player: audioPlayer,
-                builder: (context, isPlaying) {
-                  this.isPlaying = isPlaying;
-                  return _buildAudioControlButtons();
-                },
-              ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );

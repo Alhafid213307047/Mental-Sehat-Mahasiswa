@@ -77,16 +77,17 @@ class _RegisterPageState extends State<RegisterPage> {
     }
 
     try {
-      await FirebaseAuth.instance.createUserWithEmailAndPassword(
-        email: email,
-        password: password,
-      );
+      UserCredential userCredential = await FirebaseAuth.instance
+          .createUserWithEmailAndPassword(email: email, password: password);
 
-      // Display success message
+      // Kirim email verifikasi
+      await userCredential.user!.sendEmailVerification();
+
+      // Tampilkan pesan sukses
       _showSuccessSnackbar(
-          'Daftar akun telah berhasil. Silahkan melakukan login.');
+          'Daftar akun telah berhasil. Silakan periksa email Anda untuk verifikasi.');
 
-      // Wait for 2 seconds before navigating to the login page
+      // Tunggu 2 detik sebelum navigasi ke halaman login
       await Future.delayed(Duration(seconds: 2));
 
       // Navigate to the login page
