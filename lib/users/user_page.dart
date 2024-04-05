@@ -5,8 +5,13 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:mentalsehat/screens/login_option.dart';
+import 'package:mentalsehat/users/Meditation/ReligiousTrackList.dart';
+import 'package:mentalsehat/users/Meditation/burungTrackList.dart';
+import 'package:mentalsehat/users/Meditation/hujanTrackList.dart';
+import 'package:mentalsehat/users/Meditation/stresTrackList.dart';
 import 'package:mentalsehat/users/category_diagnosa_user.dart';
 import 'package:mentalsehat/users/Meditation/meditation_page.dart';
+import 'package:mentalsehat/users/daily_mood.dart';
 import 'package:mentalsehat/users/panduan_page.dart';
 import 'package:mentalsehat/users/profil_user_page.dart';
 import 'package:mentalsehat/users/riwayat_diagnosa_page.dart';
@@ -216,7 +221,6 @@ class _UserPageState extends State<UserPage> {
     );
   }
 
-
   Widget _buildNoInternetScaffold() {
     return Scaffold(
       body: Center(
@@ -272,29 +276,9 @@ class UserPageContent extends StatefulWidget {
 }
 
 class _UserPageContentState extends State<UserPageContent> {
-  void _showComingSoonDialog(String featureName) {
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          backgroundColor: Colors.white,
-          contentTextStyle:
-              TextStyle(color: Colors.black, fontFamily: 'Poppins'),
-          title: Center(
-            child: Text(
-              'Segera Hadir!',
-              style: TextStyle(color: Colors.black, fontFamily: 'Poppins'),
-            ),
-          ),
-        );
-      },
-    );
 
-    Future.delayed(const Duration(seconds: 2), () {
-      Navigator.of(context).pop();
-    });
-  }
-
+  String selectedMood = '';
+  
   @override
   Widget build(BuildContext context) {
     return Padding(
@@ -399,10 +383,221 @@ class _UserPageContentState extends State<UserPageContent> {
               }),
             ],
           ),
+          SizedBox(height: 20),
+          Text('Bagaimana Kabarmu Hari ini?',
+          style: TextStyle(
+            fontFamily: 'Poppins',
+            fontSize: 16,
+            fontWeight: FontWeight.bold
+          ),),
+          SizedBox(height: 8),
+          SingleChildScrollView(
+            scrollDirection: Axis.horizontal,
+            child: Row(
+              children: [
+                _buildEmotItem('images/baik.png', 'Baik'),
+                _buildEmotItem('images/lumayan.png', 'Lumayan'),
+                _buildEmotItem('images/biasa.png', 'Biasa'),
+                _buildEmotItem('images/kurang.png', 'Kurang'),
+                _buildEmotItem('images/buruk.png', 'Buruk'),
+              ],
+            ),
+          ),
+          SizedBox(height: 20),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Padding(
+                padding: const EdgeInsets.only(left: 4),
+                child: Text(
+                  'Meditasi',
+                  style: TextStyle(
+                    fontFamily: 'Poppins',
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ),
+              TextButton(
+                onPressed: () {
+                   Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => MeditationPage(),
+                    ),
+                  );
+                },
+                child: Text(
+                  'Lihat Semua',
+                  style: TextStyle(
+                    fontFamily: 'Poppins',
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
+                    color: Color(0xFF04558F)
+                  ),
+                ),
+              ),
+            ],
+          ),
+          SizedBox(height: 8),
+          SingleChildScrollView(
+            scrollDirection: Axis.horizontal,
+            child: Row(
+              children: [
+                _buildMeditationItem('images/stres.png', 'Mengurangi stres',
+                    () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => StresTrackList(),
+                    ),
+                  );
+                }),
+                _buildMeditationItem('images/hujan.png', 'Suara Hujan', () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => HujanTrackList(),
+                    ),
+                  );
+                }),
+                _buildMeditationItem('images/burung.jpg', 'Kicauan Burung', () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => BurungTrackList(),
+                    ),
+                  );
+                }),
+                _buildMeditationItem('images/alquran.png', 'Religius', () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => ReligiousTrackList(),
+                    ),
+                  );
+                }),
+                _buildMeditationItem('images/hujan.png', 'Random', () {
+                  // Navigator.push(
+                  //   context,
+                  //   MaterialPageRoute(
+                  //     builder: (context) => StresTrackList(),
+                  //   ),
+                  // );
+                }),
+              ],
+            ),
+          ),
         ],
       ),
     );
   }
+
+ Widget _buildMeditationItem(String imagePath, String label, VoidCallback onTap) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Padding(
+        padding: const EdgeInsets.only(right: 8, left: 8, bottom: 8),
+        child: Container(
+            width: 110,
+            height: 110, 
+            decoration: BoxDecoration(
+              color: Colors.white, 
+              borderRadius: BorderRadius.circular(12), 
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.grey.withOpacity(0.5),
+                  spreadRadius: 2,
+                  blurRadius: 5,
+                  offset: Offset(0, 3), 
+                ),
+              ],
+            ),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+               children: [
+              Image(
+                width: 60, 
+                height: 60, 
+                image: AssetImage(imagePath),
+              ),
+                SizedBox(height: 8),
+                Text(
+                  label,
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    fontSize: 12,
+                    fontFamily: 'Poppins',
+                  ),
+                ),
+              ],
+            ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildEmotItem(String imagePath, String text) {
+    return GestureDetector(
+      onTap: () {
+        setState(() {
+          selectedMood = text;
+        });
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => DailyMood(mood: selectedMood),
+          ),
+        ).then((_) {
+          setState(() {
+            selectedMood = '';
+          });
+        });
+      },
+      child: Column(
+        children: [
+          Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: Container(
+              width: 63,
+              height: 63,
+              decoration: BoxDecoration(
+                color: selectedMood == text ? Color(0xFF04558F) : Colors.white,
+                borderRadius: BorderRadius.circular(12),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.grey.withOpacity(0.5),
+                    spreadRadius: 2,
+                    blurRadius: 5,
+                    offset: Offset(0, 3),
+                  ),
+                ],
+              ),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Image(
+                    width: 45,
+                    height: 45,
+                    image: AssetImage(imagePath),
+                  ),
+                ],
+              ),
+            ),
+          ),
+           Text(
+            text,
+            textAlign: TextAlign.center,
+            style: TextStyle(
+              fontSize: 12,
+              fontFamily: 'Poppins',
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
 
   Widget _buildCircularButton(
       String imagePath, String label, VoidCallback onPressed) {

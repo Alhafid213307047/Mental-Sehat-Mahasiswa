@@ -41,6 +41,8 @@ class _PlayMeditationState extends State<PlayMeditation> {
     } else if (widget.audioPaths.any((path) => path.contains('suaraAlam')) &&
         widget.audioPaths.any((path) => path.contains('hujan'))) {
       backgroundImage = 'images/rain_animation.gif';
+    } else if (widget.audioPaths.any((path) => path.contains('religius'))) {
+      backgroundImage = 'images/islamic.jpeg';
     } else {
       // Default background image if no condition is met
       backgroundImage = 'images/default_background.gif';
@@ -224,9 +226,11 @@ class _PlayMeditationState extends State<PlayMeditation> {
                           fontFamily: 'Poppins',
                           fontWeight: FontWeight.bold,
                           fontSize: 18,
-                          color: backgroundImage == 'images/rain_animation.gif'
-                              ? Colors.white
-                              : null,
+                          color:
+                              (backgroundImage == 'images/rain_animation.gif' ||
+                                      backgroundImage == 'images/islamic.jpeg')
+                                  ? Colors.white
+                                  : null, 
                         ),
                       ),
                     ],
@@ -263,10 +267,11 @@ class _PlayMeditationState extends State<PlayMeditation> {
                             style: TextStyle(
                               fontFamily: 'Poppins',
                               fontSize: 16,
-                              color:
-                                  backgroundImage == 'images/rain_animation.gif'
-                                      ? Colors.white
-                                      : null,
+                              color: (backgroundImage ==
+                                          'images/rain_animation.gif' || 
+                                          backgroundImage == 'images/islamic.jpeg')
+                                  ? Colors.white 
+                                  : null, 
                             ),
                           ),
                           Text(
@@ -274,10 +279,11 @@ class _PlayMeditationState extends State<PlayMeditation> {
                             style: TextStyle(
                               fontFamily: 'Poppins',
                               fontSize: 16,
-                              color:
-                                  backgroundImage == 'images/rain_animation.gif'
-                                      ? Colors.white
-                                      : null,
+                              color: (backgroundImage ==
+                                          'images/rain_animation.gif' ||
+                                      backgroundImage == 'images/islamic.jpeg')
+                                  ? Colors.white
+                                  : null,  
                             ),
                           ),
                         ],

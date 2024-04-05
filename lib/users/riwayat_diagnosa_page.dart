@@ -14,18 +14,18 @@ class RiwayatDiagnosaPage extends StatefulWidget {
   State<RiwayatDiagnosaPage> createState() => _RiwayatDiagnosaPageState();
 }
 
-class _RiwayatDiagnosaPageState extends State<RiwayatDiagnosaPage> {
+class _RiwayatDiagnosaPageState extends State<RiwayatDiagnosaPage> with SingleTickerProviderStateMixin {
   final Connectivity _connectivity = Connectivity();
   late StreamSubscription<ConnectivityResult> _connectivitySubscription;
+  late TabController _tabController;
 
   @override
   void initState() {
     super.initState();
-
+    _tabController = TabController(length: 2, vsync: this);
     _connectivitySubscription = _connectivity.onConnectivityChanged.listen(
       (ConnectivityResult result) {
-        // Handle connectivity changes here if needed
-        setState(() {}); // Trigger rebuild when connectivity changes
+        setState(() {});
       },
     );
   }
@@ -33,23 +33,50 @@ class _RiwayatDiagnosaPageState extends State<RiwayatDiagnosaPage> {
   @override
   void dispose() {
     _connectivitySubscription.cancel();
+    _tabController.dispose();
     super.dispose();
   }
 
-  @override
+   @override
   Widget build(BuildContext context) {
-    return StreamBuilder<ConnectivityResult>(
-      stream: _connectivity.onConnectivityChanged,
-      initialData: ConnectivityResult.mobile,
-      builder: (context, snapshot) {
-        if (snapshot.data == ConnectivityResult.none) {
-          // Tidak ada koneksi internet
-          return _buildNoInternet();
-        } else {
-          // Terdapat koneksi internet
-          return viewDiagnosisHistory();
-        }
-      },
+    return Scaffold(
+      appBar: AppBar(
+        title: Text(
+          'Riwayat',
+          style: TextStyle(
+            fontFamily: 'Poppins',
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+        bottom: TabBar(
+          controller: _tabController,
+          tabs: [
+            Tab(
+              child: Text(
+                'Riwayat Diagnosa',
+                style: TextStyle(
+                  fontFamily: 'Poppins',
+                ),
+              ),
+            ),
+            Tab(
+              child: Text(
+                'Riwayat Mood Harian',
+                style: TextStyle(
+                  fontFamily: 'Poppins',
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+      body: TabBarView(
+        controller: _tabController,
+        children: [
+          viewDiagnosisHistory(),
+          viewMoodHistory(),
+        ],
+      ),
     );
   }
 
@@ -99,135 +126,241 @@ class _RiwayatDiagnosaPageState extends State<RiwayatDiagnosaPage> {
     );
   }
 
-  Widget viewDiagnosisHistory(){
-    return Scaffold(
-      appBar: AppBar(
-        title: Text(
-          'Riwayat Diagnosa',
-          style: TextStyle(
-            fontFamily: 'Poppins',
-            fontWeight: FontWeight.bold,
-          ),
-        ),
-      ),
-      body: StreamBuilder(
-        stream: _getDiagnosisStream(),
-        builder: (context, AsyncSnapshot<QuerySnapshot> snapshot) {
-          if (snapshot.connectionState == ConnectionState.waiting) {
-            return Center(
-              child: CircularProgressIndicator(),
-            );
-          } else if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
-            return Center(
-              child: Text('Tidak ada riwayat diagnosa.'),
-            );
-          } else {
-            List<DocumentSnapshot> sortedDocs = snapshot.data!.docs;
+  Widget viewDiagnosisHistory() {
+    return StreamBuilder(
+      stream: _getDiagnosisStream(),
+      builder: (context, AsyncSnapshot<QuerySnapshot> snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return Center(
+            child: CircularProgressIndicator(),
+          );
+        } else if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
+          return Center(
+            child: Text('Tidak ada riwayat diagnosa.'),
+          );
+        } else {
+          List<DocumentSnapshot> sortedDocs = snapshot.data!.docs;
 
-            // Urutkan dokumen berdasarkan timestamp (descending)
-            sortedDocs.sort((a, b) {
-              int timestampA = a['timestamp'];
-              int timestampB = b['timestamp'];
-              return timestampB.compareTo(timestampA);
-            });
+          // Urutkan dokumen berdasarkan timestamp (descending)
+          sortedDocs.sort((a, b) {
+            int timestampA = a['timestamp'];
+            int timestampB = b['timestamp'];
+            return timestampB.compareTo(timestampA);
+          });
 
-            return ListView(
-              children: sortedDocs.map((DocumentSnapshot document) {
-                Map<String, dynamic> data =
-                    document.data() as Map<String, dynamic>;
+          return ListView(
+            children: sortedDocs.map((DocumentSnapshot document) {
+              Map<String, dynamic> data =
+                  document.data() as Map<String, dynamic>;
 
-                DateTime diagnosisDate =
-                    DateTime.fromMillisecondsSinceEpoch(data['timestamp']);
+              DateTime diagnosisDate =
+                  DateTime.fromMillisecondsSinceEpoch(data['timestamp']);
 
-                return Card(
-                  margin: EdgeInsets.all(8.0),
-                  child: Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: Stack(
-                      children: [
-                        Row(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Expanded(
-                              flex: 1,
-                              child: Image.asset(
-                               _getImageAsset(
-                                    data['category'], data['result_category']),
-                                width: 80,
-                                height: 80,
-                              ),
+              return Card(
+                margin: EdgeInsets.all(8.0),
+                child: Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: Stack(
+                    children: [
+                      Row(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Expanded(
+                            flex: 1,
+                            child: Image.asset(
+                              _getImageAsset(
+                                  data['category'], data['result_category']),
+                              width: 80,
+                              height: 80,
                             ),
-                            Expanded(
-                              flex: 3,
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text(
-                                    data['category'],
-                                    style: TextStyle(
-                                      fontFamily: 'Poppins',
-                                      fontWeight: FontWeight.bold,
-                                    ),
+                          ),
+                          Expanded(
+                            flex: 3,
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  data['category'],
+                                  style: TextStyle(
+                                    fontFamily: 'Poppins',
+                                    fontWeight: FontWeight.bold,
                                   ),
-                                  SizedBox(height: 4),
-                                  Text(
-                                    'Tanggal: ${_formatDate(diagnosisDate)}',
-                                    style: TextStyle(
-                                      fontFamily: 'Poppins',
-                                    ),
-                                  ),
-                                  SizedBox(height: 4),
-                                  Text(
-                                    'Waktu: ${_formatTime(diagnosisDate)}',
-                                    style: TextStyle(
-                                      fontFamily: 'Poppins',
-                                    ),
-                                  ),
-                                  SizedBox(height: 4),
-                                  Text(
-                                    'Hasil: ${data['result_category']}',
-                                    style: TextStyle(
-                                      fontFamily: 'Poppins',
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ],
-                        ),
-                        Positioned(
-                          bottom: 0,
-                          right: 0,
-                          child: InkWell(
-                            onTap: () {
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (context) =>
-                                      DetailRiwayat(diagnosisId: document.id),
                                 ),
-                              );
-                            },
-                            child: Text(
-                              'Detail>>',
-                              style: TextStyle(
-                                fontFamily: 'Poppins',
-                                color: Color(0xFF04558F),
-                                fontSize: 16,
-                                fontWeight: FontWeight.bold,
+                                SizedBox(height: 4),
+                                Text(
+                                  'Tanggal: ${_formatDate(diagnosisDate)}',
+                                  style: TextStyle(
+                                    fontFamily: 'Poppins',
+                                  ),
+                                ),
+                                SizedBox(height: 4),
+                                Text(
+                                  'Waktu: ${_formatTime(diagnosisDate)}',
+                                  style: TextStyle(
+                                    fontFamily: 'Poppins',
+                                  ),
+                                ),
+                                SizedBox(height: 4),
+                                Text(
+                                  'Hasil: ${data['result_category']}',
+                                  style: TextStyle(
+                                    fontFamily: 'Poppins',
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ],
+                      ),
+                      Positioned(
+                        bottom: 0,
+                        right: 0,
+                        child: InkWell(
+                          onTap: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) =>
+                                    DetailRiwayat(diagnosisId: document.id),
                               ),
+                            );
+                          },
+                          child: Text(
+                            'Detail>>',
+                            style: TextStyle(
+                              fontFamily: 'Poppins',
+                              color: Color(0xFF04558F),
+                              fontSize: 16,
+                              fontWeight: FontWeight.bold,
                             ),
                           ),
                         ),
-                      ],
-                    ),
+                      ),
+                    ],
                   ),
-                );
-              }).toList(),
-            );
-          }
-        },
-      ),
+                ),
+              );
+            }).toList(),
+          );
+        }
+      },
+    );
+  }
+
+  Widget viewMoodHistory() {
+    return StreamBuilder(
+      stream: _getMoodStream(),
+      builder: (context, AsyncSnapshot<QuerySnapshot> snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return Center(
+            child: CircularProgressIndicator(),
+          );
+        } else if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
+          return Center(
+            child: Text('Tidak ada riwayat mood harian.'),
+          );
+        } else {
+          List<DocumentSnapshot> sortedDocs = snapshot.data!.docs;
+
+          // Sort documents by timestamp (descending)
+          sortedDocs.sort((a, b) {
+            int timestampA = a['timestamp'];
+            int timestampB = b['timestamp'];
+            return timestampB.compareTo(timestampA);
+          });
+
+          return ListView(
+            children: sortedDocs.map((DocumentSnapshot document) {
+              Map<String, dynamic> data =
+                  document.data() as Map<String, dynamic>;
+
+              DateTime moodDate = DateTime.fromMillisecondsSinceEpoch(data['timestamp']);
+
+               return Card(
+                margin: EdgeInsets.all(8.0),
+                child: Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: Stack(
+                    children: [
+                      Row(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Expanded(
+                            flex: 1,
+                            child: Image.asset(
+                              _getMoodImageAsset(data['mood']),
+                              width: 65,
+                              height: 65,
+                            ),
+                          ),
+                          Expanded(
+                            flex: 3,
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  'Tanggal: ${_formatDateMood(moodDate)}',
+                                  style: TextStyle(
+                                    fontFamily: 'Poppins',
+                                  ),
+                                ),
+                                SizedBox(height: 7),
+                                Text(
+                                  'Waktu: ${_formatTimeMood(moodDate)}',
+                                  style: TextStyle(
+                                    fontFamily: 'Poppins',
+                                  ),
+                                ),
+                                SizedBox(height: 7),
+                                Text(
+                                  'Mood: ${data['mood']}',
+                                  style: TextStyle(
+                                    fontFamily: 'Poppins',
+                                  ),
+                                ),
+                                SizedBox(height: 7),
+                                Wrap(
+                                  crossAxisAlignment: WrapCrossAlignment.start,
+                                  spacing: 8.0, 
+                                  runSpacing: 4.0,
+                                  children: data['perasaan'].map<Widget>((perasaan) {
+                                    return Container(
+                                      padding: EdgeInsets.all(4.0),
+                                      decoration: BoxDecoration(
+                                        color: Color(0xFF04558F),
+                                        borderRadius:
+                                            BorderRadius.circular(5.0),
+                                      ),
+                                      child: Text(
+                                        perasaan,
+                                        style: TextStyle(
+                                          fontFamily: 'Poppins',
+                                          color: Colors.white,
+                                        ),
+                                      ),
+                                    );
+                                  }).toList(),
+                                ),
+                                SizedBox(height: 7),
+                                Text(
+                                  '${data['detail']}',
+                                  style: TextStyle(
+                                    fontFamily: 'Poppins',
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                ),
+              );
+            }).toList(),
+          );
+        }
+      },
     );
   }
 
@@ -317,6 +450,44 @@ class _RiwayatDiagnosaPageState extends State<RiwayatDiagnosaPage> {
       // Tambahkan kasus lain jika diperlukan
       default:
         return 'images/default.png';
+    }
+  }
+
+   Stream<QuerySnapshot> _getMoodStream() {
+    User? user = FirebaseAuth.instance.currentUser;
+    String userId = user?.uid ?? '';
+
+    return FirebaseFirestore.instance
+        .collection('Users')
+        .doc(userId)
+        .collection('HistoryMood')
+        .snapshots();
+  }
+
+  String _formatDateMood(DateTime date) {
+    return DateFormat('EEEE, dd MMMM yyyy', 'id_ID').format(date);
+  }
+
+  String _formatTimeMood(DateTime date) {
+    return DateFormat.Hm('id_ID').format(date);
+  }
+
+  String _getMoodImageAsset(String mood) {
+    // Define your image assets according to different moods
+    // Example:
+    switch (mood) {
+      case 'Baik':
+        return 'images/baik.png';
+      case 'Lumayan':
+        return 'images/lumayan.png';
+      case 'Biasa':
+        return 'images/biasa.png';
+      case 'Kurang':
+        return 'images/kurang.png';
+      case 'Buruk':
+        return 'images/buruk.png';
+      default:
+        return 'images/default_mood.png';
     }
   }
 }
