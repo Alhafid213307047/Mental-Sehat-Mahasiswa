@@ -204,8 +204,9 @@ class _DiagnosaDepresiState extends State<DiagnosaDepresi> {
                 SizedBox(height: 20),
                 TextFormField(
                   controller: _namaController,
+                   maxLines: 5,
                   decoration: InputDecoration(
-                    labelText: 'Nama Gejala',
+                    labelText: 'Masukkan Nama Gejala',
                     enabledBorder: OutlineInputBorder(
                       borderSide: BorderSide(color: Colors.grey),
                       borderRadius: BorderRadius.circular(8.0),
@@ -331,8 +332,9 @@ class _DiagnosaDepresiState extends State<DiagnosaDepresi> {
                 SizedBox(height: 20),
                 TextFormField(
                   controller: _namaController,
+                  maxLines: 5,
                   decoration: InputDecoration(
-                    labelText: 'Nama Gejala',
+                    labelText: 'Masukkan Nama Gejala',
                     enabledBorder: OutlineInputBorder(
                       borderSide: BorderSide(color: Colors.grey),
                       borderRadius: BorderRadius.circular(8.0),

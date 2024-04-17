@@ -51,13 +51,17 @@ class _AddPakarPageState extends State<AddPakarPage> {
 
         // Menambah pengguna ke Firebase Authentication
         FirebaseAuth auth = FirebaseAuth.instance;
-        await auth.createUserWithEmailAndPassword(
+        UserCredential userCredential =
+            await auth.createUserWithEmailAndPassword(
           email: emailController.text,
           password: passwordController.text,
         );
 
+        // Mengirim email verifikasi
+        await userCredential.user!.sendEmailVerification();
+
         // Mendapatkan UID dari pengguna yang baru dibuat
-        String uid = auth.currentUser!.uid;
+        String uid = userCredential.user!.uid;
 
         // Menyimpan data ke koleksi "pakar" dengan menggunakan UID pengguna sebagai kunci
         await firestore.collection('pakar').doc(uid).set({
@@ -68,11 +72,13 @@ class _AddPakarPageState extends State<AddPakarPage> {
         // Menampilkan pesan sukses
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('Berhasil menambah pakar',
-            style: TextStyle(
-              fontFamily: 'Poppins',
-              color: Colors.white
-            ),),
+            content: Text(
+              'Berhasil menambah pakar. Email verifikasi telah dikirim.',
+              style: TextStyle(
+                fontFamily: 'Poppins',
+                color: Colors.white,
+              ),
+            ),
             duration: Duration(seconds: 2),
             backgroundColor: Color(0xFF04558F),
           ),
@@ -94,6 +100,7 @@ class _AddPakarPageState extends State<AddPakarPage> {
       }
     }
   }
+
 
   @override
   Widget build(BuildContext context) {

@@ -167,7 +167,7 @@ class _DetailRiwayatUserState extends State<DetailRiwayatUser> {
                     ),
                     SizedBox(height: 16),
                     Image.asset(
-                      _getImageAsset(data['category']),
+                      _getImageAsset(data['category'], data['result_category']),
                       width: 150,
                       height: 150,
                     ),
@@ -281,14 +281,71 @@ class _DetailRiwayatUserState extends State<DetailRiwayatUser> {
         .snapshots();
   }
 
-  String _getImageAsset(String? category) {
+   String _getImageAsset(String category, String resultCategory) {
     switch (category) {
       case 'Diagnosa Stres':
-        return 'images/stres.png';
+        return _getStressImageAsset(resultCategory);
+
       case 'Diagnosa Depresi':
-        return 'images/depresi.png';
+        return _getDepressionImageAsset(resultCategory);
+
       case 'Diagnosa Kecemasan':
-        return 'images/kecemasan.png';
+        return _getKecemasanImageAsset(resultCategory);
+
+      default:
+        return 'images/default.png';
+    }
+  }
+
+  String _getStressImageAsset(String resultCategory) {
+    switch (resultCategory) {
+      case 'Normal':
+        return 'images/stres_normal.png';
+      case 'Stres Ringan':
+        return 'images/stres_ringan.png';
+      case 'Stres Sedang':
+        return 'images/stres_sedang.png';
+      case 'Stres Parah':
+        return 'images/stres_parah.png';
+      case 'Stres Sangat Parah':
+        return 'images/stres_sangatparah.png';
+      // Tambahkan kasus lain jika diperlukan
+      default:
+        return 'images/default.png';
+    }
+  }
+
+  String _getDepressionImageAsset(String resultCategory) {
+    switch (resultCategory) {
+      case 'Normal':
+        return 'images/depresi_normal.png';
+      case 'Depresi Ringan':
+        return 'images/depresi_ringan.png';
+      case 'Depresi Sedang':
+        return 'images/depresi_sedang.png';
+      case 'Depresi Parah':
+        return 'images/depresi_parah.png';
+      case 'Depresi Sangat Parah':
+        return 'images/depresi_sangatparah.png';
+      // Tambahkan kasus lain jika diperlukan
+      default:
+        return 'images/default.png';
+    }
+  }
+
+  String _getKecemasanImageAsset(String resultCategory) {
+    switch (resultCategory) {
+      case 'Normal':
+        return 'images/cemas_normal.png';
+      case 'Kecemasan Ringan':
+        return 'images/cemas_ringan.png';
+      case 'Kecemasan Sedang':
+        return 'images/cemas_sedang.png';
+      case 'Kecemasan Parah':
+        return 'images/cemas_parah.png';
+      case 'Kecemasan Sangat Parah':
+        return 'images/cemas_sangatparah.png';
+      // Tambahkan kasus lain jika diperlukan
       default:
         return 'images/default.png';
     }
