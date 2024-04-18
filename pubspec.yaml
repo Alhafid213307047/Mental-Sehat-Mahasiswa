@@ -70,6 +70,7 @@ flutter:
     - assets/audios/suaraAlam/hujan/
     - assets/audios/suaraAlam/burung/
     - assets/audios/mindfulness/stres/
+    - assets/audios/mindfulness/afirmasi/
   #   - images/a_dot_ham.jpeg
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/assets-and-images/#resolution-aware

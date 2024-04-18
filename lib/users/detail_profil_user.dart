@@ -195,27 +195,32 @@ class _DetailProfileUserState extends State<DetailProfileUser> {
               child: Stack(
                 alignment: Alignment.bottomRight,
                 children: [
-                  Container(
-                    width: 120,
-                    height: 120,
-                    decoration: BoxDecoration(
-                      shape: BoxShape.circle,
-                      border: Border.all(
-                        color: Colors.grey.shade600,
-                        width: 2.0,
+                 GestureDetector(
+                    onTap: () {
+                      viewPhotoProfile();
+                    },
+                    child: Container(
+                      width: 120,
+                      height: 120,
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        border: Border.all(
+                          color: Colors.grey.shade600,
+                          width: 2.0,
+                        ),
                       ),
-                    ),
-                    child: ClipRRect(
-                      borderRadius: BorderRadius.circular(60),
-                      child: profileImageUrl != null
-                          ? Image.network(
-                              profileImageUrl!,
-                              fit: BoxFit.cover,
-                            )
-                          : Image.asset(
-                              'images/profil.jpg',
-                              fit: BoxFit.cover,
-                            ),
+                      child: ClipRRect(
+                        borderRadius: BorderRadius.circular(60),
+                        child: profileImageUrl != null
+                            ? Image.network(
+                                profileImageUrl!,
+                                fit: BoxFit.cover,
+                              )
+                            : Image.asset(
+                                'images/profil.jpg',
+                                fit: BoxFit.cover,
+                              ),
+                      ),
                     ),
                   ),
                   Container(
@@ -329,6 +334,31 @@ class _DetailProfileUserState extends State<DetailProfileUser> {
           ],
         ),
       ),
+    );
+  }
+
+   void viewPhotoProfile() {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return Dialog(
+          child: GestureDetector(
+            onTap: () {
+              Navigator.of(context).pop();
+            },
+            child: Container(
+              width: 500,
+              height: 500,
+              decoration: BoxDecoration(
+                image: DecorationImage(
+                  image: NetworkImage(profileImageUrl ?? ''),
+                  fit: BoxFit.cover,
+                ),
+              ),
+            ),
+          ),
+        );
+      },
     );
   }
 

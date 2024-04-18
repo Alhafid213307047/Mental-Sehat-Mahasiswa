@@ -5,6 +5,7 @@ import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:mentalsehat/users/Meditation/ReligiousTrackList.dart';
+import 'package:mentalsehat/users/Meditation/afirmasiTrackList.dart';
 import 'package:mentalsehat/users/Meditation/burungTrackList.dart';
 import 'package:mentalsehat/users/Meditation/hujanTrackList.dart';
 import 'package:mentalsehat/users/Meditation/stresTrackList.dart';
@@ -209,8 +210,8 @@ class _MeditationPageState extends State<MeditationPage> {
         },
         icon: Image.asset(
           iconImage,
-          width: 24, // Sesuaikan ukuran ikon sesuai kebutuhan
-          height: 24, // Sesuaikan ukuran ikon sesuai kebutuhan
+          width: 24, 
+          height: 24, 
           color:
               selectedCategory == category ? Colors.white : Color(0xFF04558F),
         ),
@@ -229,20 +230,48 @@ class _MeditationPageState extends State<MeditationPage> {
     );
   }
 
-  Widget _buildMindfulnessContent() {
+ Widget _buildMindfulnessContent() {
     return Padding(
-      padding: const EdgeInsets.only(bottom: 6, right: 12, left: 8),
+     padding: const EdgeInsets.only(bottom: 6, right: 12, left: 8, top: 15),
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Row(
+            children: [
+              _buildContentItem1('images/stres.png', 'Mengurangi Stres', () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => StresTrackList()),
+                );
+              }),
+              _buildContentItem1('images/afirmasi.png', 'Afirmasi Diri', () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => AfirmasiTrackList()),
+                );
+              }),
+              _buildContentItem1('images/afirmasi.png', 'Afirmasi Diri', () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => AfirmasiTrackList()),
+                );
+              }),
+              
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildContentItem1(
+      String imagePath, String text, Function() onTapAction) {
+    return Expanded(
       child: GestureDetector(
-        onTap: () {
-          Navigator.push(
-            context,
-            MaterialPageRoute(builder: (context) => StresTrackList()),
-          );
-        },
+        onTap: onTapAction,
         child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
+          crossAxisAlignment: CrossAxisAlignment.center,
           children: [
-            SizedBox(height: 16),
             Container(
               width: 80,
               height: 80,
@@ -250,9 +279,8 @@ class _MeditationPageState extends State<MeditationPage> {
                 borderRadius: BorderRadius.circular(8),
                 color: Colors.grey[200],
               ),
-              margin: EdgeInsets.only(left: 8),
               child: Image.asset(
-                'images/stres.png',
+                imagePath,
                 width: 50,
                 height: 50,
                 fit: BoxFit.cover,
@@ -260,7 +288,7 @@ class _MeditationPageState extends State<MeditationPage> {
             ),
             SizedBox(height: 8),
             Text(
-              'Mengurangi Stres',
+              text,
               style: TextStyle(
                 fontFamily: 'Poppins',
                 fontSize: 13,
@@ -272,6 +300,8 @@ class _MeditationPageState extends State<MeditationPage> {
       ),
     );
   }
+
+
 
   Widget _buildNatureContent() {
   return Padding(
@@ -286,7 +316,7 @@ class _MeditationPageState extends State<MeditationPage> {
                 MaterialPageRoute(builder: (context) => HujanTrackList()),
               );
             },
-            child: _buildColumnItem(
+            child: _buildContentItem2(
               'images/hujan.png',
               'Suara Hujan',
             ),
@@ -298,7 +328,7 @@ class _MeditationPageState extends State<MeditationPage> {
                 MaterialPageRoute(builder: (context) => BurungTrackList()),
               );
             },
-            child: _buildColumnItem(
+            child: _buildContentItem2(
               'images/burung.jpg',
               'Kicauan Burung',
             ),
@@ -307,7 +337,7 @@ class _MeditationPageState extends State<MeditationPage> {
             onTap: () {
               //
             },
-            child: _buildColumnItem(
+            child: _buildContentItem2(
               'images/ombak.jpg',
               'Suara Ombak',
             ),
@@ -317,10 +347,9 @@ class _MeditationPageState extends State<MeditationPage> {
     );
   }
 
-  Widget _buildColumnItem(String imagePath, String title) {
+  Widget _buildContentItem2(String imagePath, String title) {
     return Column(
-      crossAxisAlignment: CrossAxisAlignment
-          .center, // Menjadikan konten vertikal berada di tengah
+      crossAxisAlignment: CrossAxisAlignment.center, 
       children: [
         Container(
           width: 80,

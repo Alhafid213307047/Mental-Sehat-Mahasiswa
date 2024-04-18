@@ -14,10 +14,40 @@ class RiwayatDiagnosaPage extends StatefulWidget {
   State<RiwayatDiagnosaPage> createState() => _RiwayatDiagnosaPageState();
 }
 
-class _RiwayatDiagnosaPageState extends State<RiwayatDiagnosaPage> with SingleTickerProviderStateMixin {
+class _RiwayatDiagnosaPageState extends State<RiwayatDiagnosaPage>
+    with SingleTickerProviderStateMixin {
   final Connectivity _connectivity = Connectivity();
   late StreamSubscription<ConnectivityResult> _connectivitySubscription;
   late TabController _tabController;
+
+  // variabel untuk menyimpan input pencarian
+  String _searchKeyword = '';
+
+  // fungsi untuk menyaring data berdasarkan input pencarian
+  List<DocumentSnapshot> _filterDiagnosis(
+      List<DocumentSnapshot> diagnosisList) {
+    // kata kunci pencarian yang diinputkan oleh pengguna
+    String keyword = _searchKeyword.toLowerCase();
+
+    // penyaringan berdasarkan category, tanggal, waktu, dan hasil
+    return diagnosisList.where((document) {
+      Map<String, dynamic> data = document.data() as Map<String, dynamic>;
+      String category = data['category'].toString().toLowerCase();
+      String diagnosisDate =
+          _formatDate(DateTime.fromMillisecondsSinceEpoch(data['timestamp']))
+              .toLowerCase();
+      String diagnosisTime =
+          _formatTime(DateTime.fromMillisecondsSinceEpoch(data['timestamp']))
+              .toLowerCase();
+      String resultCategory = data['result_category'].toString().toLowerCase();
+
+      // kata kunci : category, tanggal, waktu, atau hasil
+      return category.contains(keyword) ||
+          diagnosisDate.contains(keyword) ||
+          diagnosisTime.contains(keyword) ||
+          resultCategory.contains(keyword);
+    }).toList();
+  }
 
   @override
   void initState() {
@@ -37,7 +67,7 @@ class _RiwayatDiagnosaPageState extends State<RiwayatDiagnosaPage> with SingleTi
     super.dispose();
   }
 
-   @override
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
@@ -73,7 +103,36 @@ class _RiwayatDiagnosaPageState extends State<RiwayatDiagnosaPage> with SingleTi
       body: TabBarView(
         controller: _tabController,
         children: [
-          viewDiagnosisHistory(),
+          Column(
+            children: [
+              // TextField untuk input pencarian
+              Padding(
+                padding:
+                    EdgeInsets.only(top: 10, right: 10, left: 10, bottom: 10),
+                child: TextField(
+                  decoration: InputDecoration(
+                    labelText: 'Cari Riwayat Diagnosa',
+                    labelStyle: TextStyle(fontFamily: 'Poppins'),
+                    prefixIcon: Icon(Icons.search),
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12.0),
+                    ),
+                    contentPadding:
+                        EdgeInsets.symmetric(vertical: 12, horizontal: 12),
+                  ),
+                  onChanged: (value) {
+                    setState(() {
+                      _searchKeyword = value;
+                    });
+                  },
+                ),
+              ),
+
+              Expanded(
+                child: viewDiagnosisHistory(), // data yang sudah disaring
+              ),
+            ],
+          ),
           viewMoodHistory(),
         ],
       ),
@@ -148,8 +207,11 @@ class _RiwayatDiagnosaPageState extends State<RiwayatDiagnosaPage> with SingleTi
             return timestampB.compareTo(timestampA);
           });
 
+          // Gunakan fungsi penyaringan untuk menyaring data
+          List<DocumentSnapshot> filteredDocs = _filterDiagnosis(sortedDocs);
+
           return ListView(
-            children: sortedDocs.map((DocumentSnapshot document) {
+            children: filteredDocs.map((DocumentSnapshot document) {
               Map<String, dynamic> data =
                   document.data() as Map<String, dynamic>;
 
@@ -274,9 +336,10 @@ class _RiwayatDiagnosaPageState extends State<RiwayatDiagnosaPage> with SingleTi
               Map<String, dynamic> data =
                   document.data() as Map<String, dynamic>;
 
-              DateTime moodDate = DateTime.fromMillisecondsSinceEpoch(data['timestamp']);
+              DateTime moodDate =
+                  DateTime.fromMillisecondsSinceEpoch(data['timestamp']);
 
-               return Card(
+              return Card(
                 margin: EdgeInsets.all(8.0),
                 child: Padding(
                   padding: const EdgeInsets.all(8.0),
@@ -321,9 +384,10 @@ class _RiwayatDiagnosaPageState extends State<RiwayatDiagnosaPage> with SingleTi
                                 SizedBox(height: 7),
                                 Wrap(
                                   crossAxisAlignment: WrapCrossAlignment.start,
-                                  spacing: 8.0, 
+                                  spacing: 8.0,
                                   runSpacing: 4.0,
-                                  children: data['perasaan'].map<Widget>((perasaan) {
+                                  children:
+                                      data['perasaan'].map<Widget>((perasaan) {
                                     return Container(
                                       padding: EdgeInsets.all(4.0),
                                       decoration: BoxDecoration(
@@ -383,14 +447,14 @@ class _RiwayatDiagnosaPageState extends State<RiwayatDiagnosaPage> with SingleTi
     return DateFormat.Hm('id_ID').format(date);
   }
 
- String _getImageAsset(String category, String resultCategory) {
-     switch (category) {
+  String _getImageAsset(String category, String resultCategory) {
+    switch (category) {
       case 'Diagnosa Stres':
         return _getStressImageAsset(resultCategory);
 
       case 'Diagnosa Depresi':
         return _getDepressionImageAsset(resultCategory);
-      
+
       case 'Diagnosa Kecemasan':
         return _getKecemasanImageAsset(resultCategory);
 
@@ -453,7 +517,7 @@ class _RiwayatDiagnosaPageState extends State<RiwayatDiagnosaPage> with SingleTi
     }
   }
 
-   Stream<QuerySnapshot> _getMoodStream() {
+  Stream<QuerySnapshot> _getMoodStream() {
     User? user = FirebaseAuth.instance.currentUser;
     String userId = user?.uid ?? '';
 

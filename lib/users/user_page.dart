@@ -28,6 +28,7 @@ class _UserPageState extends State<UserPage> {
   final GoogleSignIn googleSignIn = GoogleSignIn(scopes: ['email']);
   final Connectivity _connectivity = Connectivity();
   late StreamSubscription<ConnectivityResult> _connectivitySubscription;
+   DateTime? _lastPressedTime;
 
   @override
   void initState() {
@@ -163,60 +164,82 @@ class _UserPageState extends State<UserPage> {
   }
 
   Widget _buildUserPage() {
-    return Scaffold(
-      appBar: _currentIndex == 0
-          ? AppBar(
-              title: FutureBuilder<String>(
-                future: _getUserName(),
-                builder: (context, snapshot) {
-                  if (snapshot.connectionState == ConnectionState.done) {
-                    return Text(
-                      'Halo, ${snapshot.data}',
-                      style: TextStyle(
-                        fontFamily: 'Poppins',
-                        fontWeight: FontWeight.bold,
-                      ),
-                    );
-                  } else {
-                    return Text(
-                      'Halo, Loading...',
-                      style: TextStyle(
-                        fontFamily: 'Poppins',
-                        fontWeight: FontWeight.bold,
-                      ),
-                    );
-                  }
-                },
-              ),
-              automaticallyImplyLeading: false,
-            )
-          : null,
-      bottomNavigationBar: BottomNavigationBar(
-        items: const <BottomNavigationBarItem>[
-          BottomNavigationBarItem(
-            icon: Icon(Icons.home),
-            label: 'Beranda',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.history),
-            label: 'Riwayat',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.person),
-            label: 'Profil',
-          ),
-        ],
-        currentIndex: _currentIndex,
-        selectedItemColor: Colors.blue,
-        onTap: _onTabTapped,
-      ),
-      body: IndexedStack(
-        index: _currentIndex,
-        children: [
-          UserPageContent(),
-          RiwayatDiagnosaPage(),
-          ProfileUserPage(),
-        ],
+    return WillPopScope(
+      onWillPop: () async {
+        final now = DateTime.now();
+        final backButtonHasNotBeenPressedOrSnackBarHasBeenClosed =
+            _lastPressedTime == null || now.difference(_lastPressedTime!) > Duration(seconds: 2);
+
+        if (backButtonHasNotBeenPressedOrSnackBarHasBeenClosed) {
+          _lastPressedTime = now;
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text('Tekan sekali lagi untuk keluar',
+              style: TextStyle(
+                fontFamily: 'Poppins'
+              ),),
+              duration: Duration(seconds: 2),
+            ),
+          );
+          return false;
+        }
+        return true;
+      },
+      child: Scaffold(
+        appBar: _currentIndex == 0
+            ? AppBar(
+                title: FutureBuilder<String>(
+                  future: _getUserName(),
+                  builder: (context, snapshot) {
+                    if (snapshot.connectionState == ConnectionState.done) {
+                      return Text(
+                        'Halo, ${snapshot.data}',
+                        style: TextStyle(
+                          fontFamily: 'Poppins',
+                          fontWeight: FontWeight.bold,
+                        ),
+                      );
+                    } else {
+                      return Text(
+                        'Halo, Loading...',
+                        style: TextStyle(
+                          fontFamily: 'Poppins',
+                          fontWeight: FontWeight.bold,
+                        ),
+                      );
+                    }
+                  },
+                ),
+                automaticallyImplyLeading: false,
+              )
+            : null,
+        bottomNavigationBar: BottomNavigationBar(
+          items: const <BottomNavigationBarItem>[
+            BottomNavigationBarItem(
+              icon: Icon(Icons.home),
+              label: 'Beranda',
+            ),
+            BottomNavigationBarItem(
+              icon: Icon(Icons.history),
+              label: 'Riwayat',
+            ),
+            BottomNavigationBarItem(
+              icon: Icon(Icons.person),
+              label: 'Profil',
+            ),
+          ],
+          currentIndex: _currentIndex,
+          selectedItemColor: Colors.blue,
+          onTap: _onTabTapped,
+        ),
+        body: IndexedStack(
+          index: _currentIndex,
+          children: [
+            UserPageContent(),
+            RiwayatDiagnosaPage(),
+            ProfileUserPage(),
+          ],
+        ),
       ),
     );
   }
