@@ -36,16 +36,24 @@ class _PlayMeditationState extends State<PlayMeditation> {
     currentTrackTitle = widget.trackTitles[currentIndex];
     appBarTitle = currentTrackTitle; 
     // Determine background image based on audioPath
-    if (widget.audioPaths.any((path) => path.contains('mindfulness'))) {
-      backgroundImage = 'images/weather_animation.gif';
+    if (widget.audioPaths.any((path) => path.contains('mindfulness')) &&
+    widget.audioPaths.any((path) => path.contains('stres'))) {
+      backgroundImage = 'images/kunang_animation.gif';
+
+    } else if (widget.audioPaths.any((path) => path.contains('mindfulness')) &&
+        widget.audioPaths.any((path) => path.contains('afirmasi'))) {
+      backgroundImage = 'images/park_animation.gif';
+
     } else if (widget.audioPaths.any((path) => path.contains('suaraAlam')) &&
         widget.audioPaths.any((path) => path.contains('hujan'))) {
       backgroundImage = 'images/rain_animation.gif';
+
     } else if (widget.audioPaths.any((path) => path.contains('religius'))) {
       backgroundImage = 'images/islamic.jpeg';
+      
     } else {
       // Default background image if no condition is met
-      backgroundImage = 'images/default_background.gif';
+      backgroundImage = 'images/weather_background.gif';
     }
 
 
@@ -228,7 +236,9 @@ class _PlayMeditationState extends State<PlayMeditation> {
                           fontSize: 18,
                           color:
                               (backgroundImage == 'images/rain_animation.gif' ||
-                                      backgroundImage == 'images/islamic.jpeg')
+                                      backgroundImage == 'images/islamic.jpeg' ||
+                                      backgroundImage == 'images/kunang_animation.gif' ||
+                                      backgroundImage == 'images/park_animation.gif')
                                   ? Colors.white
                                   : null, 
                         ),
@@ -269,7 +279,11 @@ class _PlayMeditationState extends State<PlayMeditation> {
                               fontSize: 16,
                               color: (backgroundImage ==
                                           'images/rain_animation.gif' || 
-                                          backgroundImage == 'images/islamic.jpeg')
+                                          backgroundImage == 'images/islamic.jpeg'
+                                          ||
+                                      backgroundImage ==
+                                          'images/kunang_animation.gif' ||
+                                          backgroundImage == 'images/park_animation.gif')
                                   ? Colors.white 
                                   : null, 
                             ),
@@ -281,7 +295,12 @@ class _PlayMeditationState extends State<PlayMeditation> {
                               fontSize: 16,
                               color: (backgroundImage ==
                                           'images/rain_animation.gif' ||
-                                      backgroundImage == 'images/islamic.jpeg')
+                                      backgroundImage == 'images/islamic.jpeg'
+                                      ||
+                                      backgroundImage ==
+                                          'images/kunang_animation.gif' ||
+                                      backgroundImage ==
+                                          'images/park_animation.gif')
                                   ? Colors.white
                                   : null,  
                             ),

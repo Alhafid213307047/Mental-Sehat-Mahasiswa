@@ -232,11 +232,12 @@ class _MeditationPageState extends State<MeditationPage> {
 
  Widget _buildMindfulnessContent() {
     return Padding(
-     padding: const EdgeInsets.only(bottom: 6, right: 12, left: 8, top: 15),
+      padding: const EdgeInsets.only(bottom: 6, right: 12, left: 8, top: 15),
       child: Column(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           Row(
+            mainAxisAlignment: MainAxisAlignment.spaceAround,
             children: [
               _buildContentItem1('images/stres.png', 'Mengurangi Stres', () {
                 Navigator.push(
@@ -244,7 +245,8 @@ class _MeditationPageState extends State<MeditationPage> {
                   MaterialPageRoute(builder: (context) => StresTrackList()),
                 );
               }),
-              _buildContentItem1('images/afirmasi.png', 'Afirmasi Diri', () {
+              _buildContentItem1('images/kecemasan2.png', 'Meredakan Kecemasan',
+                  () {
                 Navigator.push(
                   context,
                   MaterialPageRoute(builder: (context) => AfirmasiTrackList()),
@@ -256,7 +258,6 @@ class _MeditationPageState extends State<MeditationPage> {
                   MaterialPageRoute(builder: (context) => AfirmasiTrackList()),
                 );
               }),
-              
             ],
           ),
         ],
@@ -287,12 +288,17 @@ class _MeditationPageState extends State<MeditationPage> {
               ),
             ),
             SizedBox(height: 8),
-            Text(
-              text,
-              style: TextStyle(
-                fontFamily: 'Poppins',
-                fontSize: 13,
-                color: Colors.black,
+            Container(
+              // Menggunakan container untuk mengatur tinggi teks agar setara dengan gambar
+              height: 30,
+              child: Text(
+                text,
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  fontFamily: 'Poppins',
+                  fontSize: 13,
+                  color: Colors.black,
+                ),
               ),
             ),
           ],
@@ -369,6 +375,7 @@ class _MeditationPageState extends State<MeditationPage> {
         SizedBox(height: 8),
         Text(
           title,
+          textAlign: TextAlign.center,
           style: TextStyle(
             fontFamily: 'Poppins',
             fontSize: 13,
