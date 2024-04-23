@@ -230,6 +230,7 @@ class _PlayMeditationState extends State<PlayMeditation> {
                       SizedBox(height: 16),
                       Text(
                         appBarTitle,
+                        textAlign: TextAlign.center,
                         style: TextStyle(
                           fontFamily: 'Poppins',
                           fontWeight: FontWeight.bold,

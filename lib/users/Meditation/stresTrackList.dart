@@ -141,7 +141,64 @@ class _StresTrackListState extends State<StresTrackList> {
                 'Intro Meditasi Stres',
                 'images/stres.png',
                 'assets/audios/mindfulness/stres/meditasi_stres_1.mp3',
+                '2.56',
                 0,
+              ),
+              _buildTrekListItem(
+                context,
+                'Sesi 1 - Membangun Ketenangan Dalam',
+                'images/stres.png',
+                'assets/audios/mindfulness/stres/stres_sesi1.mp3',
+                '9.30',
+                1,
+              ),
+              _buildTrekListItem(
+                context,
+                'Sesi 2 - Fokus Pada Nafas untuk Menenangkan Pikiran',
+                'images/stres.png',
+                'assets/audios/mindfulness/stres/stres_sesi2.mp3',
+                '8.03',
+                2,
+              ),
+              _buildTrekListItem(
+                context,
+                'Sesi 3 - Memusatkan Perhatian pada Perasaan',
+                'images/stres.png',
+                'assets/audios/mindfulness/stres/stres_sesi3.mp3',
+                '7.10',
+                3,
+              ),
+              _buildTrekListItem(
+                context,
+                'Sesi 4 - Menerima Stres dengan Lapang Hati',
+                'images/stres.png',
+                'assets/audios/mindfulness/stres/stres_sesi4.mp3',
+                '8.02',
+                4,
+              ),
+              _buildTrekListItem(
+                context,
+                'Sesi 5 - Menciptakan Energi Ketenangan Mental',
+                'images/stres.png',
+                'assets/audios/mindfulness/stres/stres_sesi5.mp3',
+                '7.43',
+                5,
+              ),
+              _buildTrekListItem(
+                context,
+                'Sesi 6 - Memberi Jeda Sejenak dalam Hidup',
+                'images/stres.png',
+                'assets/audios/mindfulness/stres/stres_sesi6.mp3',
+                '7.50',
+                6,
+              ),
+              _buildTrekListItem(
+                context,
+                'Sesi 7 - Menikmati Setiap Moment',
+                'images/stres.png',
+                'assets/audios/mindfulness/stres/stres_sesi7.mp3',
+                '8.19',
+                7,
               ),
               // Tambahkan trek list lainnya jika diperlukan
             ],
@@ -156,6 +213,7 @@ class _StresTrackListState extends State<StresTrackList> {
     String title,
     String imageAsset,
     String audioPath,
+    String duration,
     int index,
   ) {
     return GestureDetector(
@@ -167,10 +225,24 @@ class _StresTrackListState extends State<StresTrackList> {
               title: title,
               imageAsset: imageAsset,
               audioPaths: [
-                'assets/audios/mindfulness/stres/meditasi_stres_1.mp3'
+                'assets/audios/mindfulness/stres/meditasi_stres_1.mp3',
+                'assets/audios/mindfulness/stres/stres_sesi1.mp3',
+                'assets/audios/mindfulness/stres/stres_sesi2.mp3',
+                'assets/audios/mindfulness/stres/stres_sesi3.mp3',
+                'assets/audios/mindfulness/stres/stres_sesi4.mp3',
+                'assets/audios/mindfulness/stres/stres_sesi5.mp3',
+                'assets/audios/mindfulness/stres/stres_sesi6.mp3',
+                'assets/audios/mindfulness/stres/stres_sesi7.mp3',
               ],
               trackTitles: [
-                'Intro Meditasi Stres'
+                'Intro Meditasi Stres',
+                'Sesi 1 - Membangun Ketenangan Dalam',
+                'Sesi 2 - Fokus Pada Nafas untuk Menenangkan Pikiran',
+                'Sesi 3 - Memusatkan Perhatian pada Perasaan',
+                'Sesi 4 - Menerima Stres dengan Lapang Hati',
+                'Sesi 5 - Menciptakan Energi Ketenangan Mental',
+                'Sesi 6 - Memberi Jeda Sejenak dalam Hidup',
+                'Sesi 7 - Menikmati Setiap Moment',
               ],
               selectedIndex: index,
             ),
@@ -192,28 +264,30 @@ class _StresTrackListState extends State<StresTrackList> {
               height: 70,
             ),
             SizedBox(width: 12),
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  title,
-                  style: TextStyle(
-                    fontFamily: 'Poppins',
-                    fontSize: 18,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.black,
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    title,
+                    style: TextStyle(
+                      fontFamily: 'Poppins',
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.black,
+                    ),
                   ),
-                ),
-                SizedBox(height: 8),
-                Text(
-                  'Durasi: 2.56',
-                  style: TextStyle(
-                    fontFamily: 'Poppins',
-                    fontSize: 14,
-                    color: Colors.black,
+                  SizedBox(height: 2),
+                  Text(
+                    'Durasi: $duration',
+                    style: TextStyle(
+                      fontFamily: 'Poppins',
+                      fontSize: 14,
+                      color: Colors.black,
+                    ),
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
           ],
         ),

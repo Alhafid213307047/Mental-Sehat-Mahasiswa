@@ -130,21 +130,21 @@ class _AfirmasiTrackListState extends State<AfirmasiTrackList> {
               SizedBox(height: 30),
               _buildTrekListItem(
                   context,
-                  'Tahap 1 - Cintai Diri Sendiri',
+                  'Sesi 1 - Cintai Diri Sendiri',
                   'images/afirmasi.png',
                   'assets/audios/mindfulness/afirmasi/cintai_diri_sendiri.mp3',
                   '9.07',
                   0),
               _buildTrekListItem(
                   context,
-                  'Tahap 2 - Selalu Berfikir Positif',
+                  'Sesi 2 - Selalu Berfikir Positif',
                   'images/afirmasi.png',
                   'assets/audios/mindfulness/afirmasi/berfikir_positif.mp3',
                   '7.31',
                   1),
               _buildTrekListItem(
                   context,
-                  'Tahap 3 - Menumbuhkan Percaya Diri',
+                  'Sesi 3 - Menumbuhkan Percaya Diri',
                   'images/afirmasi.png',
                   'assets/audios/mindfulness/afirmasi/menumbuhkan_percaya_diri.mp3',
                   '7.59',
@@ -173,9 +173,9 @@ class _AfirmasiTrackListState extends State<AfirmasiTrackList> {
                 'assets/audios/mindfulness/afirmasi/menumbuhkan_percaya_diri.mp3',
               ],
               trackTitles: [
-                'Tahap 1 - Cintai Diri Sendiri',
-                'Tahap 2 - Selalu Berfikir Positif',
-                'Tahap 3 - Menumbuhkan Percaya Diri'
+                'Sesi 1 - Cintai Diri Sendiri',
+                'Sesi 2 - Selalu Berfikir Positif',
+                'Sesi 3 - Menumbuhkan Percaya Diri'
                 ],
               selectedIndex: index,
             ),
