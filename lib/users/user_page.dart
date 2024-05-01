@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:mentalsehat/screens/login_option.dart';
 import 'package:mentalsehat/users/Meditation/ReligiousTrackList.dart';
+import 'package:mentalsehat/users/Meditation/afirmasiTrackList.dart';
 import 'package:mentalsehat/users/Meditation/burungTrackList.dart';
 import 'package:mentalsehat/users/Meditation/hujanTrackList.dart';
 import 'package:mentalsehat/users/Meditation/stresTrackList.dart';
@@ -500,13 +501,13 @@ class _UserPageContentState extends State<UserPageContent> {
                     ),
                   );
                 }),
-                _buildMeditationItem('images/hujan.png', 'Random', () {
-                  // Navigator.push(
-                  //   context,
-                  //   MaterialPageRoute(
-                  //     builder: (context) => StresTrackList(),
-                  //   ),
-                  // );
+                _buildMeditationItem('images/afirmasi.png', 'Afirmasi Diri', () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => AfirmasiTrackList(),
+                    ),
+                  );
                 }),
               ],
             ),

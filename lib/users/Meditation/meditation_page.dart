@@ -8,7 +8,13 @@ import 'package:mentalsehat/users/Meditation/ReligiousTrackList.dart';
 import 'package:mentalsehat/users/Meditation/afirmasiTrackList.dart';
 import 'package:mentalsehat/users/Meditation/burungTrackList.dart';
 import 'package:mentalsehat/users/Meditation/hujanTrackList.dart';
+import 'package:mentalsehat/users/Meditation/kecemasanTrackList.dart';
+import 'package:mentalsehat/users/Meditation/malamTrackList.dart';
+import 'package:mentalsehat/users/Meditation/motivasiTrackList.dart';
+import 'package:mentalsehat/users/Meditation/ombakTrackList.dart';
 import 'package:mentalsehat/users/Meditation/stresTrackList.dart';
+import 'package:mentalsehat/users/Meditation/sungaiTrackList.dart';
+import 'package:mentalsehat/users/Meditation/tidurTrackList.dart';
 
 class MeditationPage extends StatefulWidget {
   @override
@@ -230,43 +236,7 @@ class _MeditationPageState extends State<MeditationPage> {
     );
   }
 
- Widget _buildMindfulnessContent() {
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 6, right: 12, left: 8, top: 15),
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceAround,
-            children: [
-              _buildContentItem1('images/stres.png', 'Mengurangi Stres', () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) => StresTrackList()),
-                );
-              }),
-              _buildContentItem1('images/kecemasan2.png', 'Meredakan Kecemasan',
-                  () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) => AfirmasiTrackList()),
-                );
-              }),
-              _buildContentItem1('images/afirmasi.png', 'Afirmasi Diri', () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) => AfirmasiTrackList()),
-                );
-              }),
-            ],
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildContentItem1(
-      String imagePath, String text, Function() onTapAction) {
+  Widget _buildContentItem1(String imagePath, String text, Function() onTapAction) {
     return Expanded(
       child: GestureDetector(
         onTap: onTapAction,
@@ -277,7 +247,7 @@ class _MeditationPageState extends State<MeditationPage> {
               width: 80,
               height: 80,
               decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(8),
+                borderRadius: BorderRadius.circular(12),
                 color: Colors.grey[200],
               ),
               child: Image.asset(
@@ -307,88 +277,118 @@ class _MeditationPageState extends State<MeditationPage> {
     );
   }
 
-
-
-  Widget _buildNatureContent() {
-  return Padding(
-      padding: const EdgeInsets.only(bottom: 6, right: 12, left: 8,top: 15),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+ Widget _buildMindfulnessContent() {
+    return Padding(
+      padding: const EdgeInsets.only(left: 10, right: 10, top: 20, bottom: 10),
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.start,
         children: [
-          GestureDetector(
-            onTap: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) => HujanTrackList()),
-              );
-            },
-            child: _buildContentItem2(
-              'images/hujan.png',
-              'Suara Hujan',
-            ),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              _buildContentItem1('images/stres.png', 'Mengurangi Stres', () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => StresTrackList()),
+                );
+              }),
+              _buildContentItem1('images/kecemasan2.png', 'Meredakan Kecemasan',
+                  () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => KecemasanTrackList()),
+                );
+              }),
+              _buildContentItem1('images/afirmasi.png', 'Afirmasi Diri', () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => AfirmasiTrackList()),
+                );
+              }),
+            ],
           ),
-          GestureDetector(
-            onTap: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) => BurungTrackList()),
-              );
-            },
-            child: _buildContentItem2(
-              'images/burung.jpg',
-              'Kicauan Burung',
-            ),
-          ),
-          GestureDetector(
-            onTap: () {
-              //
-            },
-            child: _buildContentItem2(
-              'images/ombak.jpg',
-              'Suara Ombak',
-            ),
+          SizedBox(height: 20),
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              _buildContentItem1('images/tidur.png', 'Tidur', () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => TidurTrackList()),
+                );
+              }),
+              _buildContentItem1('images/motivasi.png', 'Motivasi',
+                  () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => MotivasiTrackList()),
+                );
+              }),
+              Spacer(),
+            ],
           ),
         ],
       ),
     );
   }
 
-  Widget _buildContentItem2(String imagePath, String title) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.center, 
-      children: [
-        Container(
-          width: 80,
-          height: 80,
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(8),
-            color: Colors.grey[200],
+  Widget _buildNatureContent() {
+    return Padding(
+     padding: const EdgeInsets.only(left: 10, right: 10, top: 20, bottom: 10),
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.start,
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              _buildContentItem1('images/hujan.png', 'Suara Hujan', () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => HujanTrackList()),
+                );
+              }),
+              _buildContentItem1('images/burung.png', 'Kicauan Burung',
+                  () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => BurungTrackList()),
+                );
+              }),
+              _buildContentItem1('images/ombak.png', 'Suara Ombak', () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => OmbakTrackList()),
+                );
+              }),
+            ],
           ),
-          margin: EdgeInsets.only(left: 8),
-          child: Image.asset(
-            imagePath,
-            width: 50,
-            height: 50,
-            fit: BoxFit.cover,
+         Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              _buildContentItem1('images/sungai.png', 'Suara Sungai', () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => SungaiTrackList()),
+                );
+              }),
+              _buildContentItem1('images/malam.png', 'Malam Hari', () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => MalamTrackList()),
+                );
+              }),
+              Spacer(),
+            ],
           ),
-        ),
-        SizedBox(height: 8),
-        Text(
-          title,
-          textAlign: TextAlign.center,
-          style: TextStyle(
-            fontFamily: 'Poppins',
-            fontSize: 13,
-            color: Colors.black,
-          ),
-        ),
-      ],
+        ],
+      ),
     );
   }
 
+
   Widget _buildReligiousContent() {
     return Padding(
-      padding: const EdgeInsets.only(bottom: 6, right: 12, left: 8),
+      padding: const EdgeInsets.only(left: 10, right: 10, top: 20, bottom: 10),
       child: GestureDetector(
         onTap: () {
           Navigator.push(
@@ -399,12 +399,11 @@ class _MeditationPageState extends State<MeditationPage> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            SizedBox(height: 16),
             Container(
               width: 80,
               height: 80,
               decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(8),
+                borderRadius: BorderRadius.circular(12),
                 color: Colors.grey[200],
               ),
               margin: EdgeInsets.only(left: 8),

@@ -123,7 +123,7 @@ class _BurungTrackListState extends State<BurungTrackList> {
             children: [
               SizedBox(height: 16),
               Image.asset(
-                'images/burung.jpg',
+                'images/burung.png',
                 width: 150,
                 height: 150,
               ),
@@ -131,14 +131,14 @@ class _BurungTrackListState extends State<BurungTrackList> {
               _buildTrekListItem(
                   context,
                   'Senandung Burung',
-                  'images/burung.jpg',
+                  'images/burung.png',
                   'assets/audios/suaraAlam/burung/senandung_burung2.mp3',
                   '15.00',
                   0),
               _buildTrekListItem(
                 context,
                 'Burung Pagi Hari',
-                'images/burung.jpg',
+                'images/burung.png',
                 'assets/audios/suaraAlam/burung/burung_pagi.mp3',
                 '10.17',
                 1,
@@ -146,7 +146,7 @@ class _BurungTrackListState extends State<BurungTrackList> {
               _buildTrekListItem(
                 context,
                 'Burung di Tepi Sungai',
-                'images/burung.jpg',
+                'images/burung.png',
                 'assets/audios/suaraAlam/burung/burung_ditepi_sungai.mp3',
                 '16.10',
                 2,
@@ -154,7 +154,7 @@ class _BurungTrackListState extends State<BurungTrackList> {
               _buildTrekListItem(
                 context,
                 'Burung dan Piano',
-                'images/burung.jpg',
+                'images/burung.png',
                 'assets/audios/suaraAlam/burung/burung_piano.mp3',
                 '20.00',
                 3,
