@@ -159,6 +159,14 @@ class _SplashScreenState extends State<SplashScreen> {
                 color: Color(0xFF04558F),
               ),
             ),
+            Text(
+              'Mahasiswa',
+              style: TextStyle(
+                fontSize: 24,
+                fontFamily: "Poppins",
+                color: Color(0xFF04558F),
+              ),
+            ),
             SizedBox(height: 50),
             SizedBox(
               width: 20,

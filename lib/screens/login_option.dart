@@ -349,7 +349,7 @@ class _LoginOptionState extends State<LoginOption> {
                 ),
                 SizedBox(height: 16),
                 Text(
-                  'Selamat Datang di Mental Sehat',
+                  'Selamat Datang di Mental Sehat Mahasiswa',
                   style: TextStyle(
                     fontSize: 20,
                     fontWeight: FontWeight.bold,

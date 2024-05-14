@@ -4,6 +4,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:mentalsehat/screens/login_option.dart';
 import 'package:mentalsehat/users/detail_profil_user.dart';
+import 'package:mentalsehat/users/dukungan_page.dart';
 import 'package:mentalsehat/users/tentangkami_page.dart';
 
 class ProfileUserPage extends StatefulWidget {
@@ -140,6 +141,13 @@ class _ProfileUserPageState extends State<ProfileUserPage> {
     );
   }
 
+  void _navigateToDukunganPage() {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+          builder: (context) => DukunganPage()), 
+    );
+  }
   void _navigateToTentangKamiPage() {
     Navigator.push(
       context,
@@ -245,15 +253,22 @@ class _ProfileUserPageState extends State<ProfileUserPage> {
               ),
             ),
             SizedBox(height: 20),
-            Row(
+           Row(
               children: [
-                Icon(Icons.support), 
-                SizedBox(width: 10),
-                Text(
-                  'Dukungan',
-                  style: TextStyle(
-                    fontFamily: 'Poppins',
-                    fontSize: 16,
+                InkWell(
+                  onTap: _navigateToDukunganPage,
+                  child: Row(
+                    children: [
+                      Icon(Icons.support),
+                      SizedBox(width: 10),
+                      Text(
+                        'Dukungan',
+                        style: TextStyle(
+                          fontFamily: 'Poppins',
+                          fontSize: 16,
+                        ),
+                      ),
+                    ],
                   ),
                 ),
               ],

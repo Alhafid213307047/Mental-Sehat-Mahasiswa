@@ -24,7 +24,7 @@ class TentangKamiPage extends StatelessWidget {
                   ),
                   SizedBox(height: 12),
                   Text(
-                    'Mental Sehat',
+                    'Mental Sehat Mahasiswa',
                     style: TextStyle(
                       fontSize: 24,
                       fontFamily: "Poppins",
@@ -41,7 +41,7 @@ class TentangKamiPage extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: <Widget>[
                   Text(
-                    'Selamat Datang di Mental Sehat!',
+                    'Selamat Datang di Mental Sehat Mahasiswa!',
                     style: TextStyle(
                       fontFamily: 'Poppins',
                       fontSize: 18,
