@@ -1,5 +1,7 @@
 import 'dart:async';
+
 import 'package:connectivity_plus/connectivity_plus.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:mentalsehat/users/Meditation/playMeditation.dart';
 
@@ -13,19 +15,50 @@ class HujanTrackList extends StatefulWidget {
 class _HujanTrackListState extends State<HujanTrackList> {
   final Connectivity _connectivity = Connectivity();
   late StreamSubscription<ConnectivityResult> _connectivitySubscription;
-  final List<String> trackTitles = [];
+  final List<String> trackTitles = [
+    'Rintik Hujan Gerimis',
+    'Hujan dan Gemuruh',
+  ];
 
+  final List<String> audioPaths = [
+    'suaraAlam/hujan/Rintik_hujan_gerimis.mp3',
+    'suaraAlam/hujan/hujan_gemuruh.mp3',
+  ];
+
+  final List<String> durations = [
+    '30.03',
+    '18.01',
+  ];
+
+  List<String> audioUrls = [];
 
   @override
   void initState() {
     super.initState();
-
     _connectivitySubscription = _connectivity.onConnectivityChanged.listen(
       (ConnectivityResult result) {
-        // Handle connectivity changes here if needed
         setState(() {}); // Trigger rebuild when connectivity changes
       },
     );
+
+    _loadAudioUrls();
+  }
+
+  Future<void> _loadAudioUrls() async {
+    List<String> urls = await getAudioUrls(audioPaths);
+    setState(() {
+      audioUrls = urls;
+    });
+  }
+
+  Future<List<String>> getAudioUrls(List<String> filePaths) async {
+    List<String> urls = [];
+    for (String path in filePaths) {
+      String downloadURL =
+          await FirebaseStorage.instance.ref(path).getDownloadURL();
+      urls.add(downloadURL);
+    }
+    return urls;
   }
 
   @override
@@ -41,11 +74,9 @@ class _HujanTrackListState extends State<HujanTrackList> {
       initialData: ConnectivityResult.mobile,
       builder: (context, snapshot) {
         if (snapshot.data == ConnectivityResult.none) {
-          // Tidak ada koneksi internet
           return _buildNoInternet();
         } else {
-          // Terdapat koneksi internet
-          return _buildNatureTrackList();
+          return _buildStresTrackList();
         }
       },
     );
@@ -97,7 +128,7 @@ class _HujanTrackListState extends State<HujanTrackList> {
     );
   }
 
-  Widget _buildNatureTrackList() {
+  Widget _buildStresTrackList() {
     return Scaffold(
       appBar: AppBar(
         title: Text(
@@ -124,26 +155,30 @@ class _HujanTrackListState extends State<HujanTrackList> {
               SizedBox(height: 16),
               Image.asset(
                 'images/hujan.png',
-                width: 150,
-                height: 150,
+                width: 100,
+                height: 100,
               ),
-              SizedBox(height: 30),
-              _buildTrekListItem(
-                context,
-                'Rintik Hujan Gerimis',
-                'images/hujan.png',
-                'assets/audios/suaraAlam/hujan/rintik_hujan_gerimis.mp3',
-                '30.03',
-                0
+              SizedBox(height: 16),
+              Text(
+                'Suara hujan yang menenangkan untuk membantu Anda rileks dan tidur nyenyak.',
+                style: TextStyle(
+                  fontFamily: 'Poppins',
+                  fontSize: 16,
+                  color: Colors.black,
+                ),
+                textAlign: TextAlign.center,
               ),
-              _buildTrekListItem(
-                context,
-                'Hujan dan Gemuruh',
-                'images/hujan.png',
-                'assets/audios/suaraAlam/hujan/hujan_gemuruh.mp3',
-                '18.01',
-                1,
-              ),
+              SizedBox(height: 16),
+              ...List.generate(trackTitles.length, (index) {
+                return _buildTrekListItem(
+                  context,
+                  trackTitles[index],
+                  'images/hujan.png',
+                  audioUrls.isNotEmpty ? audioUrls[index] : '',
+                  durations[index],
+                  index,
+                );
+              }),
             ],
           ),
         ),
@@ -155,29 +190,26 @@ class _HujanTrackListState extends State<HujanTrackList> {
     BuildContext context,
     String title,
     String imageAsset,
-    String audioPath,
+    String audioUrl,
     String duration,
-    int index
+    int index,
   ) {
     return GestureDetector(
       onTap: () {
-        Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder: (context) => PlayMeditation(
-              title: title,
-              imageAsset: imageAsset,
-              audioPaths: [
-                'assets/audios/suaraAlam/hujan/rintik_hujan_gerimis.mp3',
-                'assets/audios/suaraAlam/hujan/hujan_gemuruh.mp3',
-              ],
-              trackTitles: [
-              'Rintik Hujan Gerimis',
-              'Hujan dan Gemuruh'],
-              selectedIndex: index,
+        if (audioUrls.isNotEmpty) {
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => PlayMeditation(
+                title: title,
+                imageAsset: imageAsset,
+                audioPaths: audioUrls,
+                trackTitles: trackTitles,
+                selectedIndex: index,
+              ),
             ),
-          ),
-        );
+          );
+        }
       },
       child: Container(
         margin: EdgeInsets.symmetric(vertical: 8),
@@ -194,28 +226,30 @@ class _HujanTrackListState extends State<HujanTrackList> {
               height: 70,
             ),
             SizedBox(width: 12),
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  title,
-                  style: TextStyle(
-                    fontFamily: 'Poppins',
-                    fontSize: 18,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.black,
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    title,
+                    style: TextStyle(
+                      fontFamily: 'Poppins',
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.black,
+                    ),
                   ),
-                ),
-                SizedBox(height: 2),
-                Text(
-                  'Durasi: $duration',
-                  style: TextStyle(
-                    fontFamily: 'Poppins',
-                    fontSize: 14,
-                    color: Colors.black,
+                  SizedBox(height: 2),
+                  Text(
+                    'Durasi: $duration',
+                    style: TextStyle(
+                      fontFamily: 'Poppins',
+                      fontSize: 14,
+                      color: Colors.black,
+                    ),
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
           ],
         ),

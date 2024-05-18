@@ -30,7 +30,7 @@ class _PakarPageState extends State<PakarPage> {
     _connectivitySubscription = _connectivity.onConnectivityChanged.listen(
       (ConnectivityResult result) {
         // Handle connectivity changes here if needed
-        setState(() {}); // Trigger rebuild when connectivity changes
+        setState(() {}); 
       },
     );
     _fetchPakarName();

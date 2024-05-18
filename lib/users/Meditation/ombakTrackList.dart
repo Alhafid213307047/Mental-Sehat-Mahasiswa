@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:connectivity_plus/connectivity_plus.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:mentalsehat/users/Meditation/playMeditation.dart';
 
@@ -14,18 +15,53 @@ class OmbakTrackList extends StatefulWidget {
 class _OmbakTrackListState extends State<OmbakTrackList> {
   final Connectivity _connectivity = Connectivity();
   late StreamSubscription<ConnectivityResult> _connectivitySubscription;
-  final List<String> trackTitles = [];
+  final List<String> trackTitles = [
+    'Ombak Pantai Menenangkan',
+    'Relaksasi Ombak dan Piano',
+    'Relaksasi Ombak dan Gitar',
+  ];
+
+  final List<String> audioPaths = [
+    'suaraAlam/ombak/ombak_tenang.mp3',
+    'suaraAlam/ombak/ombak_piano.mp3',
+    'suaraAlam/ombak/ombak_gitar.mp3',
+  ];
+
+  final List<String> durations = [
+    '30.00',
+    '30.00',
+    '30.41',
+  ];
+
+  List<String> audioUrls = [];
 
   @override
   void initState() {
     super.initState();
-
     _connectivitySubscription = _connectivity.onConnectivityChanged.listen(
       (ConnectivityResult result) {
-        // Handle connectivity changes here if needed
         setState(() {}); // Trigger rebuild when connectivity changes
       },
     );
+
+    _loadAudioUrls();
+  }
+
+  Future<void> _loadAudioUrls() async {
+    List<String> urls = await getAudioUrls(audioPaths);
+    setState(() {
+      audioUrls = urls;
+    });
+  }
+
+  Future<List<String>> getAudioUrls(List<String> filePaths) async {
+    List<String> urls = [];
+    for (String path in filePaths) {
+      String downloadURL =
+          await FirebaseStorage.instance.ref(path).getDownloadURL();
+      urls.add(downloadURL);
+    }
+    return urls;
   }
 
   @override
@@ -41,11 +77,9 @@ class _OmbakTrackListState extends State<OmbakTrackList> {
       initialData: ConnectivityResult.mobile,
       builder: (context, snapshot) {
         if (snapshot.data == ConnectivityResult.none) {
-          // Tidak ada koneksi internet
           return _buildNoInternet();
         } else {
-          // Terdapat koneksi internet
-          return _buildOmbakTrackList();
+          return _buildStresTrackList();
         }
       },
     );
@@ -97,7 +131,7 @@ class _OmbakTrackListState extends State<OmbakTrackList> {
     );
   }
 
-  Widget _buildOmbakTrackList() {
+  Widget _buildStresTrackList() {
     return Scaffold(
       appBar: AppBar(
         title: Text(
@@ -124,32 +158,30 @@ class _OmbakTrackListState extends State<OmbakTrackList> {
               SizedBox(height: 16),
               Image.asset(
                 'images/ombak.png',
-                width: 150,
-                height: 150,
+                width: 100,
+                height: 100,
               ),
-              SizedBox(height: 30),
-              _buildTrekListItem(
+              SizedBox(height: 16),
+              Text(
+                'Suara ombak yang menenangkan untuk membantu Anda rileks dan merasa dekat dengan alam.',
+                style: TextStyle(
+                  fontFamily: 'Poppins',
+                  fontSize: 16,
+                  color: Colors.black,
+                ),
+                textAlign: TextAlign.center,
+              ),
+              SizedBox(height: 16),
+              ...List.generate(trackTitles.length, (index) {
+                return _buildTrekListItem(
                   context,
-                  'Ombak Pantai Menenangkan',
+                  trackTitles[index],
                   'images/ombak.png',
-                  'assets/audios/suaraAlam/ombak/ombak_tenang.mp3',
-                  '30.00',
-                  0),
-              _buildTrekListItem(
-                  context,
-                  'Relaksasi Ombak dan Piano',
-                  'images/ombak.png',
-                  'assets/audios/suaraAlam/ombak/ombak_piano.mp3',
-                  '30.00',
-                  1),
-              _buildTrekListItem(
-                  context,
-                  'Relaksasi Ombak dan Gitar',
-                  'images/ombak.png',
-                  'assets/audios/suaraAlam/ombak/ombak_gitar.mp3',
-                  '30.41',
-                  2),
-             
+                  audioUrls.isNotEmpty ? audioUrls[index] : '',
+                  durations[index],
+                  index,
+                );
+              }),
             ],
           ),
         ),
@@ -157,30 +189,30 @@ class _OmbakTrackListState extends State<OmbakTrackList> {
     );
   }
 
-  Widget _buildTrekListItem(BuildContext context, String title,
-      String imageAsset, String audioPath, String duration, int index) {
+  Widget _buildTrekListItem(
+    BuildContext context,
+    String title,
+    String imageAsset,
+    String audioUrl,
+    String duration,
+    int index,
+  ) {
     return GestureDetector(
       onTap: () {
-        Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder: (context) => PlayMeditation(
-              title: title,
-              imageAsset: imageAsset,
-              audioPaths: [
-                'assets/audios/suaraAlam/ombak/ombak_tenang.mp3',
-                'assets/audios/suaraAlam/ombak/ombak_piano.mp3',
-                'assets/audios/suaraAlam/ombak/ombak_gitar.mp3',
-              ],
-              trackTitles: [
-                'Ombak Pantai Menenangkan',
-                'Relaksasi Ombak dan Piano',
-                'Relaksasi Ombak dan Gitar',
-                ],
-              selectedIndex: index,
+        if (audioUrls.isNotEmpty) {
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => PlayMeditation(
+                title: title,
+                imageAsset: imageAsset,
+                audioPaths: audioUrls,
+                trackTitles: trackTitles,
+                selectedIndex: index,
+              ),
             ),
-          ),
-        );
+          );
+        }
       },
       child: Container(
         margin: EdgeInsets.symmetric(vertical: 8),
@@ -197,28 +229,30 @@ class _OmbakTrackListState extends State<OmbakTrackList> {
               height: 70,
             ),
             SizedBox(width: 12),
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  title,
-                  style: TextStyle(
-                    fontFamily: 'Poppins',
-                    fontSize: 18,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.black,
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    title,
+                    style: TextStyle(
+                      fontFamily: 'Poppins',
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.black,
+                    ),
                   ),
-                ),
-                SizedBox(height: 2),
-                Text(
-                  'Durasi: $duration',
-                  style: TextStyle(
-                    fontFamily: 'Poppins',
-                    fontSize: 14,
-                    color: Colors.black,
+                  SizedBox(height: 2),
+                  Text(
+                    'Durasi: $duration',
+                    style: TextStyle(
+                      fontFamily: 'Poppins',
+                      fontSize: 14,
+                      color: Colors.black,
+                    ),
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
           ],
         ),

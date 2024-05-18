@@ -1,9 +1,9 @@
 import 'dart:async';
 
-import 'package:connectivity_plus/connectivity_plus.dart';
-import 'package:flutter/material.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:connectivity_plus/connectivity_plus.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/material.dart';
 import 'package:mentalsehat/users/user_page.dart';
 
 class IntroductionPage extends StatefulWidget {
@@ -374,6 +374,7 @@ class _IntroductionPageState extends State<IntroductionPage> {
         'umur': umur,
         'tanggal_lahir': tanggal,
         'jenis_kelamin': _selectedGender,
+        'image': '',
       });
 
       // Arahkan ke halaman UserPage
@@ -386,9 +387,5 @@ class _IntroductionPageState extends State<IntroductionPage> {
       // Tangani kesalahan
     }
   }
-
-
-
-
 
 }

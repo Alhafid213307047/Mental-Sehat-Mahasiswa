@@ -69,17 +69,8 @@ flutter:
     - images/
     - images/panduan/
     - assets/audios/
-    - assets/audios/religius/
-    - assets/audios/suaraAlam/hujan/
-    - assets/audios/suaraAlam/burung/
-    - assets/audios/suaraAlam/ombak/
-    - assets/audios/suaraAlam/sungai/
-    - assets/audios/suaraAlam/malam/
-    - assets/audios/mindfulness/tidur/
-    - assets/audios/mindfulness/motivasi/
-    - assets/audios/mindfulness/stres/
-    - assets/audios/mindfulness/afirmasi/
-    - assets/audios/mindfulness/kecemasan/
+    # - assets/audios/religius/
+    
   #   - images/a_dot_ham.jpeg
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/assets-and-images/#resolution-aware

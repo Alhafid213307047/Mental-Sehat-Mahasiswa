@@ -1,4 +1,5 @@
 import 'dart:async';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -9,9 +10,9 @@ import 'package:mentalsehat/users/Meditation/ReligiousTrackList.dart';
 import 'package:mentalsehat/users/Meditation/afirmasiTrackList.dart';
 import 'package:mentalsehat/users/Meditation/burungTrackList.dart';
 import 'package:mentalsehat/users/Meditation/hujanTrackList.dart';
+import 'package:mentalsehat/users/Meditation/meditation_page.dart';
 import 'package:mentalsehat/users/Meditation/stresTrackList.dart';
 import 'package:mentalsehat/users/category_diagnosa_user.dart';
-import 'package:mentalsehat/users/Meditation/meditation_page.dart';
 import 'package:mentalsehat/users/daily_mood.dart';
 import 'package:mentalsehat/users/panduan_page.dart';
 import 'package:mentalsehat/users/profil_user_page.dart';

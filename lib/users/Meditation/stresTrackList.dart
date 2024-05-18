@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter/material.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:mentalsehat/users/Meditation/playMeditation.dart';
 
 class StresTrackList extends StatefulWidget {
@@ -12,18 +13,68 @@ class StresTrackList extends StatefulWidget {
 class _StresTrackListState extends State<StresTrackList> {
   final Connectivity _connectivity = Connectivity();
   late StreamSubscription<ConnectivityResult> _connectivitySubscription;
-  final List<String> trackTitles = [];
+  final List<String> trackTitles = [
+    'Intro Meditasi Stres',
+    'Sesi 1 - Membangun Ketenangan Dalam',
+    'Sesi 2 - Fokus Pada Nafas untuk Menenangkan Pikiran',
+    'Sesi 3 - Memusatkan Perhatian pada Perasaan',
+    'Sesi 4 - Menerima Stres dengan Lapang Hati',
+    'Sesi 5 - Menciptakan Energi Ketenangan Mental',
+    'Sesi 6 - Memberi Jeda Sejenak dalam Hidup',
+    'Sesi 7 - Menikmati Setiap Moment',
+  ];
+
+  final List<String> audioPaths = [
+    'mindfulness/stres/meditasi_stres_1.mp3',
+    'mindfulness/stres/stres_sesi1.mp3',
+    'mindfulness/stres/stres_sesi2.mp3',
+    'mindfulness/stres/stres_sesi3.mp3',
+    'mindfulness/stres/stres_sesi4.mp3',
+    'mindfulness/stres/stres_sesi5.mp3',
+    'mindfulness/stres/stres_sesi6.mp3',
+    'mindfulness/stres/stres_sesi7.mp3',
+  ];
+
+  final List<String> durations = [
+    '2.56',
+    '9.30',
+    '8.03',
+    '7.10',
+    '8.02',
+    '7.43',
+    '7.50',
+    '8.19',
+  ];
+
+  List<String> audioUrls = [];
 
   @override
   void initState() {
     super.initState();
-
     _connectivitySubscription = _connectivity.onConnectivityChanged.listen(
       (ConnectivityResult result) {
-        // Handle connectivity changes here if needed
         setState(() {}); // Trigger rebuild when connectivity changes
       },
     );
+
+    _loadAudioUrls();
+  }
+
+  Future<void> _loadAudioUrls() async {
+    List<String> urls = await getAudioUrls(audioPaths);
+    setState(() {
+      audioUrls = urls;
+    });
+  }
+
+  Future<List<String>> getAudioUrls(List<String> filePaths) async {
+    List<String> urls = [];
+    for (String path in filePaths) {
+      String downloadURL =
+          await FirebaseStorage.instance.ref(path).getDownloadURL();
+      urls.add(downloadURL);
+    }
+    return urls;
   }
 
   @override
@@ -39,10 +90,8 @@ class _StresTrackListState extends State<StresTrackList> {
       initialData: ConnectivityResult.mobile,
       builder: (context, snapshot) {
         if (snapshot.data == ConnectivityResult.none) {
-          // Tidak ada koneksi internet
           return _buildNoInternet();
         } else {
-          // Terdapat koneksi internet
           return _buildStresTrackList();
         }
       },
@@ -136,71 +185,16 @@ class _StresTrackListState extends State<StresTrackList> {
                 textAlign: TextAlign.center,
               ),
               SizedBox(height: 16),
-              _buildTrekListItem(
-                context,
-                'Intro Meditasi Stres',
-                'images/stres.png',
-                'assets/audios/mindfulness/stres/meditasi_stres_1.mp3',
-                '2.56',
-                0,
-              ),
-              _buildTrekListItem(
-                context,
-                'Sesi 1 - Membangun Ketenangan Dalam',
-                'images/stres.png',
-                'assets/audios/mindfulness/stres/stres_sesi1.mp3',
-                '9.30',
-                1,
-              ),
-              _buildTrekListItem(
-                context,
-                'Sesi 2 - Fokus Pada Nafas untuk Menenangkan Pikiran',
-                'images/stres.png',
-                'assets/audios/mindfulness/stres/stres_sesi2.mp3',
-                '8.03',
-                2,
-              ),
-              _buildTrekListItem(
-                context,
-                'Sesi 3 - Memusatkan Perhatian pada Perasaan',
-                'images/stres.png',
-                'assets/audios/mindfulness/stres/stres_sesi3.mp3',
-                '7.10',
-                3,
-              ),
-              _buildTrekListItem(
-                context,
-                'Sesi 4 - Menerima Stres dengan Lapang Hati',
-                'images/stres.png',
-                'assets/audios/mindfulness/stres/stres_sesi4.mp3',
-                '8.02',
-                4,
-              ),
-              _buildTrekListItem(
-                context,
-                'Sesi 5 - Menciptakan Energi Ketenangan Mental',
-                'images/stres.png',
-                'assets/audios/mindfulness/stres/stres_sesi5.mp3',
-                '7.43',
-                5,
-              ),
-              _buildTrekListItem(
-                context,
-                'Sesi 6 - Memberi Jeda Sejenak dalam Hidup',
-                'images/stres.png',
-                'assets/audios/mindfulness/stres/stres_sesi6.mp3',
-                '7.50',
-                6,
-              ),
-              _buildTrekListItem(
-                context,
-                'Sesi 7 - Menikmati Setiap Moment',
-                'images/stres.png',
-                'assets/audios/mindfulness/stres/stres_sesi7.mp3',
-                '8.19',
-                7,
-              ),
-              // Tambahkan trek list lainnya jika diperlukan
+              ...List.generate(trackTitles.length, (index) {
+                return _buildTrekListItem(
+                  context,
+                  trackTitles[index],
+                  'images/stres.png',
+                  audioUrls.isNotEmpty ? audioUrls[index] : '',
+                  durations[index],
+                  index,
+                );
+              }),
             ],
           ),
         ),
@@ -212,42 +206,26 @@ class _StresTrackListState extends State<StresTrackList> {
     BuildContext context,
     String title,
     String imageAsset,
-    String audioPath,
+    String audioUrl,
     String duration,
     int index,
   ) {
     return GestureDetector(
       onTap: () {
-        Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder: (context) => PlayMeditation(
-              title: title,
-              imageAsset: imageAsset,
-              audioPaths: [
-                'assets/audios/mindfulness/stres/meditasi_stres_1.mp3',
-                'assets/audios/mindfulness/stres/stres_sesi1.mp3',
-                'assets/audios/mindfulness/stres/stres_sesi2.mp3',
-                'assets/audios/mindfulness/stres/stres_sesi3.mp3',
-                'assets/audios/mindfulness/stres/stres_sesi4.mp3',
-                'assets/audios/mindfulness/stres/stres_sesi5.mp3',
-                'assets/audios/mindfulness/stres/stres_sesi6.mp3',
-                'assets/audios/mindfulness/stres/stres_sesi7.mp3',
-              ],
-              trackTitles: [
-                'Intro Meditasi Stres',
-                'Sesi 1 - Membangun Ketenangan Dalam',
-                'Sesi 2 - Fokus Pada Nafas untuk Menenangkan Pikiran',
-                'Sesi 3 - Memusatkan Perhatian pada Perasaan',
-                'Sesi 4 - Menerima Stres dengan Lapang Hati',
-                'Sesi 5 - Menciptakan Energi Ketenangan Mental',
-                'Sesi 6 - Memberi Jeda Sejenak dalam Hidup',
-                'Sesi 7 - Menikmati Setiap Moment',
-              ],
-              selectedIndex: index,
+        if (audioUrls.isNotEmpty) {
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => PlayMeditation(
+                title: title,
+                imageAsset: imageAsset,
+                audioPaths: audioUrls,
+                trackTitles: trackTitles,
+                selectedIndex: index,
+              ),
             ),
-          ),
-        );
+          );
+        }
       },
       child: Container(
         margin: EdgeInsets.symmetric(vertical: 8),

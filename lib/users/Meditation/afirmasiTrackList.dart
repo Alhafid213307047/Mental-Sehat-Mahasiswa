@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:connectivity_plus/connectivity_plus.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:mentalsehat/users/Meditation/playMeditation.dart';
 
@@ -14,18 +15,54 @@ class AfirmasiTrackList extends StatefulWidget {
 class _AfirmasiTrackListState extends State<AfirmasiTrackList> {
   final Connectivity _connectivity = Connectivity();
   late StreamSubscription<ConnectivityResult> _connectivitySubscription;
-  final List<String> trackTitles = [];
+  final List<String> trackTitles = [
+    'Sesi 1 - Cintai Diri Sendiri',
+    'Sesi 2 - Selalu Berfikir Positif',
+    'Sesi 3 - Menumbuhkan Percaya Diri',
+  ];
+
+  final List<String> audioPaths = [
+    'mindfulness/afirmasi/cintai_diri_sendiri.mp3',
+    'mindfulness/afirmasi/berfikir_positif.mp3',
+    'mindfulness/afirmasi/menumbuhkan_percaya_diri.mp3',
+    
+  ];
+
+  final List<String> durations = [
+    '9.07',
+    '7.31',
+    '7.59',
+  ];
+
+  List<String> audioUrls = [];
 
   @override
   void initState() {
     super.initState();
-
     _connectivitySubscription = _connectivity.onConnectivityChanged.listen(
       (ConnectivityResult result) {
-        // Handle connectivity changes here if needed
         setState(() {}); // Trigger rebuild when connectivity changes
       },
     );
+
+    _loadAudioUrls();
+  }
+
+  Future<void> _loadAudioUrls() async {
+    List<String> urls = await getAudioUrls(audioPaths);
+    setState(() {
+      audioUrls = urls;
+    });
+  }
+
+  Future<List<String>> getAudioUrls(List<String> filePaths) async {
+    List<String> urls = [];
+    for (String path in filePaths) {
+      String downloadURL =
+          await FirebaseStorage.instance.ref(path).getDownloadURL();
+      urls.add(downloadURL);
+    }
+    return urls;
   }
 
   @override
@@ -41,11 +78,9 @@ class _AfirmasiTrackListState extends State<AfirmasiTrackList> {
       initialData: ConnectivityResult.mobile,
       builder: (context, snapshot) {
         if (snapshot.data == ConnectivityResult.none) {
-          // Tidak ada koneksi internet
           return _buildNoInternet();
         } else {
-          // Terdapat koneksi internet
-          return _buildAfirmasiTrackList();
+          return _buildStresTrackList();
         }
       },
     );
@@ -97,7 +132,7 @@ class _AfirmasiTrackListState extends State<AfirmasiTrackList> {
     );
   }
 
-  Widget _buildAfirmasiTrackList() {
+  Widget _buildStresTrackList() {
     return Scaffold(
       appBar: AppBar(
         title: Text(
@@ -124,32 +159,30 @@ class _AfirmasiTrackListState extends State<AfirmasiTrackList> {
               SizedBox(height: 16),
               Image.asset(
                 'images/afirmasi.png',
-                width: 150,
-                height: 150,
+                width: 100,
+                height: 100,
               ),
-              SizedBox(height: 30),
-              _buildTrekListItem(
-                  context,
-                  'Sesi 1 - Cintai Diri Sendiri',
-                  'images/afirmasi.png',
-                  'assets/audios/mindfulness/afirmasi/cintai_diri_sendiri.mp3',
-                  '9.07',
-                  0),
-              _buildTrekListItem(
-                  context,
-                  'Sesi 2 - Selalu Berfikir Positif',
-                  'images/afirmasi.png',
-                  'assets/audios/mindfulness/afirmasi/berfikir_positif.mp3',
-                  '7.31',
-                  1),
-              _buildTrekListItem(
-                  context,
-                  'Sesi 3 - Menumbuhkan Percaya Diri',
-                  'images/afirmasi.png',
-                  'assets/audios/mindfulness/afirmasi/menumbuhkan_percaya_diri.mp3',
-                  '7.59',
-                  2,
+              SizedBox(height: 16),
+              Text(
+                'Meditasiini digunakan untuk membantumu mencintai diri sendiri, berpikir positif, dan menumbuhkan rasa percaya diri.',
+                style: TextStyle(
+                  fontFamily: 'Poppins',
+                  fontSize: 16,
+                  color: Colors.black,
+                ),
+                textAlign: TextAlign.center,
               ),
+              SizedBox(height: 16),
+              ...List.generate(trackTitles.length, (index) {
+                return _buildTrekListItem(
+                  context,
+                  trackTitles[index],
+                  'images/afirmasi.png',
+                  audioUrls.isNotEmpty ? audioUrls[index] : '',
+                  durations[index],
+                  index,
+                );
+              }),
             ],
           ),
         ),
@@ -157,30 +190,30 @@ class _AfirmasiTrackListState extends State<AfirmasiTrackList> {
     );
   }
 
-  Widget _buildTrekListItem(BuildContext context, String title,
-      String imageAsset, String audioPath, String duration, int index) {
+  Widget _buildTrekListItem(
+    BuildContext context,
+    String title,
+    String imageAsset,
+    String audioUrl,
+    String duration,
+    int index,
+  ) {
     return GestureDetector(
       onTap: () {
-        Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder: (context) => PlayMeditation(
-              title: title,
-              imageAsset: imageAsset,
-              audioPaths: [
-                'assets/audios/mindfulness/afirmasi/cintai_diri_sendiri.mp3',
-                'assets/audios/mindfulness/afirmasi/berfikir_positif.mp3',
-                'assets/audios/mindfulness/afirmasi/menumbuhkan_percaya_diri.mp3',
-              ],
-              trackTitles: [
-                'Sesi 1 - Cintai Diri Sendiri',
-                'Sesi 2 - Selalu Berfikir Positif',
-                'Sesi 3 - Menumbuhkan Percaya Diri'
-                ],
-              selectedIndex: index,
+        if (audioUrls.isNotEmpty) {
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => PlayMeditation(
+                title: title,
+                imageAsset: imageAsset,
+                audioPaths: audioUrls,
+                trackTitles: trackTitles,
+                selectedIndex: index,
+              ),
             ),
-          ),
-        );
+          );
+        }
       },
       child: Container(
         margin: EdgeInsets.symmetric(vertical: 8),
@@ -197,7 +230,7 @@ class _AfirmasiTrackListState extends State<AfirmasiTrackList> {
               height: 70,
             ),
             SizedBox(width: 12),
-             Expanded(
+            Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [

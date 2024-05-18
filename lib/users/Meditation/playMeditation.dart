@@ -1,5 +1,5 @@
-import 'package:flutter/material.dart';
 import 'package:assets_audio_player/assets_audio_player.dart';
+import 'package:flutter/material.dart';
 
 class PlayMeditation extends StatefulWidget {
   final String title;
@@ -35,53 +35,16 @@ class _PlayMeditationState extends State<PlayMeditation> {
     currentIndex = widget.selectedIndex;
     currentTrackTitle = widget.trackTitles[currentIndex];
     appBarTitle = currentTrackTitle;
+
     // Determine background image based on audioPath
-    if (widget.audioPaths.any((path) => path.contains('mindfulness')) &&
-        widget.audioPaths.any((path) => path.contains('stres'))) {
-      backgroundImage = 'images/kunang_animation.gif';
+    _setBackgroundImage();
 
-    } else if (widget.audioPaths.any((path) => path.contains('mindfulness')) &&
-        widget.audioPaths.any((path) => path.contains('afirmasi'))) {
-      backgroundImage = 'images/park_animation.gif';
-
-    } else if (widget.audioPaths.any((path) => path.contains('mindfulness')) &&
-        widget.audioPaths.any((path) => path.contains('kecemasan'))) {
-      backgroundImage = 'images/sakura_animation.gif';
-
-    } else if (widget.audioPaths.any((path) => path.contains('mindfulness')) &&
-        widget.audioPaths.any((path) => path.contains('tidur'))) {
-      backgroundImage = 'images/night_animation.gif';
-
-    } else if (widget.audioPaths.any((path) => path.contains('mindfulness')) &&
-        widget.audioPaths.any((path) => path.contains('motivasi'))) {
-      backgroundImage = 'images/motivasi_animation.gif';
-
-    } else if (widget.audioPaths.any((path) => path.contains('suaraAlam')) &&
-        widget.audioPaths.any((path) => path.contains('hujan'))) {
-      backgroundImage = 'images/rain5_animation.gif';
-
-    } else if (widget.audioPaths.any((path) => path.contains('suaraAlam')) &&
-        widget.audioPaths.any((path) => path.contains('burung'))) {
-      backgroundImage = 'images/kicauan_burung.gif';
-
-    } else if (widget.audioPaths.any((path) => path.contains('suaraAlam')) &&
-        widget.audioPaths.any((path) => path.contains('ombak'))) {
-      backgroundImage = 'images/ombak_animation.gif';
-
-    } else if (widget.audioPaths.any((path) => path.contains('suaraAlam')) &&
-        widget.audioPaths.any((path) => path.contains('sungai'))) {
-      backgroundImage = 'images/waterflow2_animation.gif';
-
-    } else if (widget.audioPaths.any((path) => path.contains('suaraAlam')) &&
-        widget.audioPaths.any((path) => path.contains('malam'))) {
-      backgroundImage = 'images/night2_animation.gif';
-
-    } else if (widget.audioPaths.any((path) => path.contains('religius'))) {
-      backgroundImage = 'images/islamic.jpeg';
-    } else {
-      // Default background image if no condition is met
-      backgroundImage = 'images/weather_background.gif';
-    }
+    audioPlayer.currentPosition.listen((event) {
+      setState(() {
+        currentTrackTitle =
+            widget.trackTitles[currentIndex]; // Perbarui currentTrackTitle
+      });
+    });
 
     audioPlayer.isPlaying.listen((event) {
       setState(() {
@@ -89,21 +52,7 @@ class _PlayMeditationState extends State<PlayMeditation> {
       });
     });
 
-    audioPlayer.open(Audio(widget.audioPaths[currentIndex]), autoStart: true);
-    audioPlayer.currentPosition.listen((event) {
-      setState(() {
-        currentTrackTitle = widget.trackTitles[currentIndex];
-      });
-    });
-
-    audioPlayer.playlistFinished.listen((finished) {
-      if (isAutoPlayEnabled && finished) {
-        _continueAutomatically(); // Mulai pemutaran otomatis setelah trek saat ini selesai
-        if (finished && currentIndex == widget.audioPaths.length - 1) {
-          print("Last track finished: ${widget.trackTitles[currentIndex]}");
-        }
-      }
-    });
+    _openAudio(currentIndex);
 
     audioPlayer.playlistAudioFinished.listen((audio) {
       print(
@@ -112,9 +61,56 @@ class _PlayMeditationState extends State<PlayMeditation> {
         if (audio.hasNext) {
           currentIndex++;
           currentTrackTitle = widget.trackTitles[currentIndex];
+          appBarTitle = currentTrackTitle; // Perbarui appBarTitle
         }
       });
     });
+  }
+
+  void _setBackgroundImage() {
+    if (widget.audioPaths.any((path) => path.contains('mindfulness')) &&
+        widget.audioPaths.any((path) => path.contains('stres'))) {
+      backgroundImage = 'images/kunang_animation.gif';
+    } else if (widget.audioPaths.any((path) => path.contains('mindfulness')) &&
+        widget.audioPaths.any((path) => path.contains('afirmasi'))) {
+      backgroundImage = 'images/park_animation.gif';
+    } else if (widget.audioPaths.any((path) => path.contains('mindfulness')) &&
+        widget.audioPaths.any((path) => path.contains('kecemasan'))) {
+      backgroundImage = 'images/sakura_animation.gif';
+    } else if (widget.audioPaths.any((path) => path.contains('mindfulness')) &&
+        widget.audioPaths.any((path) => path.contains('tidur'))) {
+      backgroundImage = 'images/night_animation.gif';
+    } else if (widget.audioPaths.any((path) => path.contains('mindfulness')) &&
+        widget.audioPaths.any((path) => path.contains('motivasi'))) {
+      backgroundImage = 'images/motivasi_animation.gif';
+    } else if (widget.audioPaths.any((path) => path.contains('suaraAlam')) &&
+        widget.audioPaths.any((path) => path.contains('hujan'))) {
+      backgroundImage = 'images/rain5_animation.gif';
+    } else if (widget.audioPaths.any((path) => path.contains('suaraAlam')) &&
+        widget.audioPaths.any((path) => path.contains('burung'))) {
+      backgroundImage = 'images/kicauan_burung.gif';
+    } else if (widget.audioPaths.any((path) => path.contains('suaraAlam')) &&
+        widget.audioPaths.any((path) => path.contains('ombak'))) {
+      backgroundImage = 'images/ombak_animation.gif';
+    } else if (widget.audioPaths.any((path) => path.contains('suaraAlam')) &&
+        widget.audioPaths.any((path) => path.contains('sungai'))) {
+      backgroundImage = 'images/waterflow2_animation.gif';
+    } else if (widget.audioPaths.any((path) => path.contains('suaraAlam')) &&
+        widget.audioPaths.any((path) => path.contains('malam'))) {
+      backgroundImage = 'images/night2_animation.gif';
+    } else if (widget.audioPaths.any((path) => path.contains('religius'))) {
+      backgroundImage = 'images/islamic.jpeg';
+    } else {
+      backgroundImage = 'images/weather_background.gif';
+    }
+  }
+
+  void _openAudio(int index) {
+    audioPlayer.open(
+      Audio.network(widget.audioPaths[index]),
+      autoStart: true,
+      showNotification: true,
+    );
   }
 
   @override
@@ -133,39 +129,19 @@ class _PlayMeditationState extends State<PlayMeditation> {
 
   void _updateAppBarTitle() {
     setState(() {
-      // Mengubah judul AppBar sesuai dengan trek audio yang sedang diputar
       appBarTitle = currentTrackTitle;
     });
   }
 
-  void _continueAutomatically() {
-    if (currentIndex <= widget.audioPaths.length - 1) {
-      if (!audioPlayer.isPlaying.value) {
-        // Periksa apakah audio saat ini telah selesai
-        currentIndex++;
-        setState(() {
-          currentTrackTitle = widget.trackTitles[currentIndex];
-        });
-        audioPlayer.open(Audio(widget.audioPaths[currentIndex]),
-            autoStart: true);
-        _updateAppBarTitle();
-      }
-    } else {
-      audioPlayer.stop();
-    }
-  }
-
   void _skipNext() {
     if (currentIndex < widget.audioPaths.length - 1) {
-      // Cek apakah masih ada trek berikutnya dalam daftar
       currentIndex++;
       setState(() {
         currentTrackTitle = widget.trackTitles[currentIndex];
       });
-      audioPlayer.open(Audio(widget.audioPaths[currentIndex]), autoStart: true);
+      _openAudio(currentIndex);
       _updateAppBarTitle();
     } else {
-      // Jika tidak ada trek berikutnya, tampilkan snackbar
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(
@@ -179,15 +155,13 @@ class _PlayMeditationState extends State<PlayMeditation> {
 
   void _skipPrevious() {
     if (currentIndex > 0) {
-      // Cek apakah masih ada trek sebelumnya dalam daftar
       currentIndex--;
       setState(() {
         currentTrackTitle = widget.trackTitles[currentIndex];
       });
-      audioPlayer.open(Audio(widget.audioPaths[currentIndex]), autoStart: true);
+      _openAudio(currentIndex);
       _updateAppBarTitle();
     } else {
-      // Jika tidak ada trek sebelumnya, tampilkan snackbar
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(
@@ -203,22 +177,51 @@ class _PlayMeditationState extends State<PlayMeditation> {
     setState(() {
       isAutoPlayEnabled = !isAutoPlayEnabled;
     });
-    // Tampilkan Snackbar sesuai kondisi
+
     final message = isAutoPlayEnabled
         ? 'Beralih ke putaran otomatis'
         : 'Beralih ke pemutaran manual';
-    ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
         content: Text(
-      message,
-      style: TextStyle(fontFamily: 'Poppins'),
-    )));
-    if (isAutoPlayEnabled && !audioPlayer.isPlaying.value) {
-      _continueAutomatically(); // Mulai pemutaran otomatis jika audio saat ini telah selesai
+          message,
+          style: TextStyle(fontFamily: 'Poppins'),
+        ),
+      ),
+    );
+
+    if (isAutoPlayEnabled) {
+      if (!isPlaying) {
+        _playNextIfAvailable();
+      } else {
+        audioPlayer.playlistAudioFinished.listen((audio) {
+          if (!audio.hasNext) {
+            _playNextIfAvailable();
+          }
+        });
+      }
+    } else {
+      audioPlayer.playlistAudioFinished.drain(); 
+      if (!isPlaying) {
+        audioPlayer.stop();
+      }
     }
   }
 
+  void _playNextIfAvailable() {
+    if (currentIndex < widget.audioPaths.length - 1) {
+      currentIndex++;
+      setState(() {
+        currentTrackTitle = widget.trackTitles[currentIndex];
+        appBarTitle = currentTrackTitle;
+      });
+      _openAudio(currentIndex);
+    }
+  }
+
+
   void _handleBackButton() {
-    audioPlayer.stop(); // Menghentikan semua audio saat kembali
+    audioPlayer.stop();
     Navigator.pop(context);
   }
 
@@ -261,20 +264,28 @@ class _PlayMeditationState extends State<PlayMeditation> {
                           fontFamily: 'Poppins',
                           fontWeight: FontWeight.bold,
                           fontSize: 18,
-                          color: (backgroundImage == 'images/rain_animation.gif' ||
-                                  backgroundImage == 'images/islamic.jpeg' ||
-                                  backgroundImage == 'images/kunang_animation.gif' ||
-                                  backgroundImage == 'images/sakura_animation.gif' ||
-                                  backgroundImage == 'images/rain5_animation.gif' ||
-                                  backgroundImage == 'images/ombak_animation.gif' ||
-                                  backgroundImage == 'images/night_animation.gif' ||
-                                  backgroundImage == 'images/night2_animation.gif' ||
-                                  backgroundImage == 'images/waterflow2_animation.gif' ||
-                                  backgroundImage == 'images/motivasi_animation.gif' ||
-                                  backgroundImage == 'images/park_animation.gif'
-                                  )
-                              ? Colors.white
-                              : null,
+                          color:
+                              (backgroundImage == 'images/rain5_animation.gif' ||
+                                      backgroundImage ==
+                                          'images/islamic.jpeg' ||
+                                      backgroundImage ==
+                                          'images/kunang_animation.gif' ||
+                                      backgroundImage ==
+                                          'images/sakura_animation.gif' ||
+                                      backgroundImage ==
+                                          'images/ombak_animation.gif' ||
+                                      backgroundImage ==
+                                          'images/night_animation.gif' ||
+                                      backgroundImage ==
+                                          'images/night2_animation.gif' ||
+                                      backgroundImage ==
+                                          'images/waterflow2_animation.gif' ||
+                                      backgroundImage ==
+                                          'images/motivasi_animation.gif' ||
+                                      backgroundImage ==
+                                          'images/park_animation.gif')
+                                  ? Colors.white
+                                  : null,
                         ),
                       ),
                     ],
@@ -312,19 +323,28 @@ class _PlayMeditationState extends State<PlayMeditation> {
                             style: TextStyle(
                               fontFamily: 'Poppins',
                               fontSize: 16,
-                              color: (backgroundImage == 'images/rain_animation.gif' ||
-                                      backgroundImage == 'images/islamic.jpeg' ||
-                                      backgroundImage == 'images/kunang_animation.gif' ||
-                                      backgroundImage == 'images/rain5_animation.gif' ||
-                                      backgroundImage == 'images/sakura_animation.gif' ||
-                                      backgroundImage == 'images/ombak_animation.gif' ||
-                                      backgroundImage == 'images/night_animation.gif' ||
-                                      backgroundImage == 'images/night2_animation.gif' ||
-                                      backgroundImage == 'images/waterflow2_animation.gif' ||
-                                      backgroundImage == 'images/motivasi_animation.gif' ||
-                                      backgroundImage == 'images/park_animation.gif')
-                                  ? Colors.white
-                                  : null,
+                              color:
+                                  (backgroundImage == 'images/rain5_animation.gif' ||
+                                          backgroundImage ==
+                                              'images/islamic.jpeg' ||
+                                          backgroundImage ==
+                                              'images/kunang_animation.gif' ||
+                                          backgroundImage ==
+                                              'images/sakura_animation.gif' ||
+                                          backgroundImage ==
+                                              'images/ombak_animation.gif' ||
+                                          backgroundImage ==
+                                              'images/night_animation.gif' ||
+                                          backgroundImage ==
+                                              'images/night2_animation.gif' ||
+                                          backgroundImage ==
+                                              'images/waterflow2_animation.gif' ||
+                                          backgroundImage ==
+                                              'images/motivasi_animation.gif' ||
+                                          backgroundImage ==
+                                              'images/park_animation.gif')
+                                      ? Colors.white
+                                      : null,
                             ),
                           ),
                           Text(
@@ -332,19 +352,28 @@ class _PlayMeditationState extends State<PlayMeditation> {
                             style: TextStyle(
                               fontFamily: 'Poppins',
                               fontSize: 16,
-                               color: (backgroundImage == 'images/rain_animation.gif' ||
-                                      backgroundImage == 'images/islamic.jpeg' ||
-                                      backgroundImage == 'images/kunang_animation.gif' ||
-                                      backgroundImage == 'images/rain5_animation.gif' ||
-                                      backgroundImage == 'images/sakura_animation.gif' ||
-                                      backgroundImage == 'images/ombak_animation.gif' ||
-                                      backgroundImage == 'images/night_animation.gif' ||
-                                      backgroundImage == 'images/night2_animation.gif' ||
-                                      backgroundImage == 'images/waterflow2_animation.gif' ||
-                                      backgroundImage == 'images/motivasi_animation.gif' ||
-                                      backgroundImage == 'images/park_animation.gif')
-                                  ? Colors.white
-                                  : null,
+                              color:
+                                  (backgroundImage == 'images/rain5_animation.gif' ||
+                                          backgroundImage ==
+                                              'images/islamic.jpeg' ||
+                                          backgroundImage ==
+                                              'images/kunang_animation.gif' ||
+                                          backgroundImage ==
+                                              'images/sakura_animation.gif' ||
+                                          backgroundImage ==
+                                              'images/ombak_animation.gif' ||
+                                          backgroundImage ==
+                                              'images/night_animation.gif' ||
+                                          backgroundImage ==
+                                              'images/night2_animation.gif' ||
+                                          backgroundImage ==
+                                              'images/waterflow2_animation.gif' ||
+                                          backgroundImage ==
+                                              'images/motivasi_animation.gif' ||
+                                          backgroundImage ==
+                                              'images/park_animation.gif')
+                                      ? Colors.white
+                                      : null,
                             ),
                           ),
                         ],
@@ -377,9 +406,7 @@ class _PlayMeditationState extends State<PlayMeditation> {
         onTap: onPressed,
         child: CircleAvatar(
           radius: 30,
-          backgroundColor: iconColor ??
-              Color(
-                  0xFF04558F), // Gunakan abu-abu jika iconColor tidak disediakan
+          backgroundColor: iconColor ?? Color(0xFF04558F),
           child: Icon(
             icon,
             color: Colors.white,
@@ -390,19 +417,19 @@ class _PlayMeditationState extends State<PlayMeditation> {
   }
 
   Widget _buildAudioControlButtons() {
-    return Row(mainAxisAlignment: MainAxisAlignment.center, children: [
-      _buildCircularIconButton(Icons.skip_previous, () {
-        _skipPrevious();
-      }),
-      _buildCircularIconButton(
-        isPlaying ? Icons.pause : Icons.play_arrow,
-        _playPause,
-      ),
-      _buildCircularIconButton(Icons.skip_next, () {
-        _skipNext();
-      }),
-      _buildCircularIconButton(Icons.refresh, _toggleAutoPlay,
-          iconColor: isAutoPlayEnabled ? Color(0xFF04558F) : Colors.grey),
-    ]);
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        _buildCircularIconButton(Icons.skip_previous, _skipPrevious),
+        _buildCircularIconButton(
+            isPlaying ? Icons.pause : Icons.play_arrow, _playPause),
+        _buildCircularIconButton(Icons.skip_next, _skipNext),
+        _buildCircularIconButton(
+          Icons.refresh,
+          _toggleAutoPlay,
+          iconColor: isAutoPlayEnabled ? Color(0xFF04558F) : Colors.grey,
+        ),
+      ],
+    );
   }
 }

@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:connectivity_plus/connectivity_plus.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:mentalsehat/users/Meditation/playMeditation.dart';
 
@@ -14,18 +15,50 @@ class TidurTrackList extends StatefulWidget {
 class _TidurTrackListState extends State<TidurTrackList> {
   final Connectivity _connectivity = Connectivity();
   late StreamSubscription<ConnectivityResult> _connectivitySubscription;
-  final List<String> trackTitles = [];
+  final List<String> trackTitles = [
+    'Pernafasan untuk Tidur',
+    'Bermimpi Indah',
+  ];
+
+  final List<String> audioPaths = [
+    'mindfulness/tidur/pernafasan_tidur.mp3',
+    'mindfulness/tidur/bermimpi_indah.mp3',
+  ];
+
+  final List<String> durations = [
+    '10.16',
+    '10.06',
+  ];
+
+  List<String> audioUrls = [];
 
   @override
   void initState() {
     super.initState();
-
     _connectivitySubscription = _connectivity.onConnectivityChanged.listen(
       (ConnectivityResult result) {
-        // Handle connectivity changes here if needed
         setState(() {}); // Trigger rebuild when connectivity changes
       },
     );
+
+    _loadAudioUrls();
+  }
+
+  Future<void> _loadAudioUrls() async {
+    List<String> urls = await getAudioUrls(audioPaths);
+    setState(() {
+      audioUrls = urls;
+    });
+  }
+
+  Future<List<String>> getAudioUrls(List<String> filePaths) async {
+    List<String> urls = [];
+    for (String path in filePaths) {
+      String downloadURL =
+          await FirebaseStorage.instance.ref(path).getDownloadURL();
+      urls.add(downloadURL);
+    }
+    return urls;
   }
 
   @override
@@ -41,11 +74,9 @@ class _TidurTrackListState extends State<TidurTrackList> {
       initialData: ConnectivityResult.mobile,
       builder: (context, snapshot) {
         if (snapshot.data == ConnectivityResult.none) {
-          // Tidak ada koneksi internet
           return _buildNoInternet();
         } else {
-          // Terdapat koneksi internet
-          return _buildTidurTrackList();
+          return _buildStresTrackList();
         }
       },
     );
@@ -97,7 +128,7 @@ class _TidurTrackListState extends State<TidurTrackList> {
     );
   }
 
-  Widget _buildTidurTrackList() {
+  Widget _buildStresTrackList() {
     return Scaffold(
       appBar: AppBar(
         title: Text(
@@ -124,24 +155,30 @@ class _TidurTrackListState extends State<TidurTrackList> {
               SizedBox(height: 16),
               Image.asset(
                 'images/tidur.png',
-                width: 150,
-                height: 150,
+                width: 100,
+                height: 100,
               ),
-              SizedBox(height: 30),
-              _buildTrekListItem(
+              SizedBox(height: 16),
+              Text(
+                'Meditasi ini dirancang untuk membantumu lebih rileks dan mendapatkan tidur yang nyenyak.',
+                style: TextStyle(
+                  fontFamily: 'Poppins',
+                  fontSize: 16,
+                  color: Colors.black,
+                ),
+                textAlign: TextAlign.center,
+              ),
+              SizedBox(height: 16),
+              ...List.generate(trackTitles.length, (index) {
+                return _buildTrekListItem(
                   context,
-                  'Pernafasan untuk Tidur',
+                  trackTitles[index],
                   'images/tidur.png',
-                  'assets/audios/mindfulness/tidur/pernafasan_tidur.mp3',
-                  '10.16',
-                  0),
-              _buildTrekListItem(
-                  context,
-                  'Bermimpi Indah',
-                  'images/tidur.png',
-                  'assets/audios/mindfulness/tidur/bermimpi_indah.mp3',
-                  '10.06',
-                  1),
+                  audioUrls.isNotEmpty ? audioUrls[index] : '',
+                  durations[index],
+                  index,
+                );
+              }),
             ],
           ),
         ),
@@ -149,28 +186,30 @@ class _TidurTrackListState extends State<TidurTrackList> {
     );
   }
 
-  Widget _buildTrekListItem(BuildContext context, String title,
-      String imageAsset, String audioPath, String duration, int index) {
+  Widget _buildTrekListItem(
+    BuildContext context,
+    String title,
+    String imageAsset,
+    String audioUrl,
+    String duration,
+    int index,
+  ) {
     return GestureDetector(
       onTap: () {
-        Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder: (context) => PlayMeditation(
-              title: title,
-              imageAsset: imageAsset,
-              audioPaths: [
-                'assets/audios/mindfulness/tidur/pernafasan_tidur.mp3',
-                'assets/audios/mindfulness/tidur/bermimpi_indah.mp3',
-              ],
-              trackTitles: [
-                'Pernafasan untuk Tidur',
-                'Bermimpi Indah',
-              ],
-              selectedIndex: index,
+        if (audioUrls.isNotEmpty) {
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => PlayMeditation(
+                title: title,
+                imageAsset: imageAsset,
+                audioPaths: audioUrls,
+                trackTitles: trackTitles,
+                selectedIndex: index,
+              ),
             ),
-          ),
-        );
+          );
+        }
       },
       child: Container(
         margin: EdgeInsets.symmetric(vertical: 8),
@@ -187,28 +226,30 @@ class _TidurTrackListState extends State<TidurTrackList> {
               height: 70,
             ),
             SizedBox(width: 12),
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  title,
-                  style: TextStyle(
-                    fontFamily: 'Poppins',
-                    fontSize: 18,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.black,
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    title,
+                    style: TextStyle(
+                      fontFamily: 'Poppins',
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.black,
+                    ),
                   ),
-                ),
-                SizedBox(height: 2),
-                Text(
-                  'Durasi: $duration',
-                  style: TextStyle(
-                    fontFamily: 'Poppins',
-                    fontSize: 14,
-                    color: Colors.black,
+                  SizedBox(height: 2),
+                  Text(
+                    'Durasi: $duration',
+                    style: TextStyle(
+                      fontFamily: 'Poppins',
+                      fontSize: 14,
+                      color: Colors.black,
+                    ),
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
           ],
         ),
@@ -216,3 +257,4 @@ class _TidurTrackListState extends State<TidurTrackList> {
     );
   }
 }
+

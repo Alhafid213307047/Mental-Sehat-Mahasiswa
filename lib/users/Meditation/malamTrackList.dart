@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:connectivity_plus/connectivity_plus.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:mentalsehat/users/Meditation/playMeditation.dart';
 
@@ -14,18 +15,50 @@ class MalamTrackList extends StatefulWidget {
 class _MalamTrackListState extends State<MalamTrackList> {
   final Connectivity _connectivity = Connectivity();
   late StreamSubscription<ConnectivityResult> _connectivitySubscription;
-  final List<String> trackTitles = [];
+  final List<String> trackTitles = [
+    'Malam Hari di Desa',
+    'Malam dan Piano',
+  ];
+
+  final List<String> audioPaths = [
+    'suaraAlam/malam/malam_didesa.mp3',
+    'suaraAlam/malam/malam_piano.mp3',
+  ];
+
+  final List<String> durations = [
+    '20.00',
+    '23.00',
+  ];
+
+  List<String> audioUrls = [];
 
   @override
   void initState() {
     super.initState();
-
     _connectivitySubscription = _connectivity.onConnectivityChanged.listen(
       (ConnectivityResult result) {
-        // Handle connectivity changes here if needed
         setState(() {}); // Trigger rebuild when connectivity changes
       },
     );
+
+    _loadAudioUrls();
+  }
+
+  Future<void> _loadAudioUrls() async {
+    List<String> urls = await getAudioUrls(audioPaths);
+    setState(() {
+      audioUrls = urls;
+    });
+  }
+
+  Future<List<String>> getAudioUrls(List<String> filePaths) async {
+    List<String> urls = [];
+    for (String path in filePaths) {
+      String downloadURL =
+          await FirebaseStorage.instance.ref(path).getDownloadURL();
+      urls.add(downloadURL);
+    }
+    return urls;
   }
 
   @override
@@ -41,11 +74,9 @@ class _MalamTrackListState extends State<MalamTrackList> {
       initialData: ConnectivityResult.mobile,
       builder: (context, snapshot) {
         if (snapshot.data == ConnectivityResult.none) {
-          // Tidak ada koneksi internet
           return _buildNoInternet();
         } else {
-          // Terdapat koneksi internet
-          return _buildTidurTrackList();
+          return _buildStresTrackList();
         }
       },
     );
@@ -97,7 +128,7 @@ class _MalamTrackListState extends State<MalamTrackList> {
     );
   }
 
-  Widget _buildTidurTrackList() {
+  Widget _buildStresTrackList() {
     return Scaffold(
       appBar: AppBar(
         title: Text(
@@ -124,24 +155,30 @@ class _MalamTrackListState extends State<MalamTrackList> {
               SizedBox(height: 16),
               Image.asset(
                 'images/malam.png',
-                width: 150,
-                height: 150,
+                width: 100,
+                height: 100,
               ),
-              SizedBox(height: 30),
-              _buildTrekListItem(
+              SizedBox(height: 16),
+              Text(
+                'Suara malam hari yang menenangkan untuk membantu Anda rileks dan membantu tidur dengan nyenyak.',
+                style: TextStyle(
+                  fontFamily: 'Poppins',
+                  fontSize: 16,
+                  color: Colors.black,
+                ),
+                textAlign: TextAlign.center,
+              ),
+              SizedBox(height: 16),
+              ...List.generate(trackTitles.length, (index) {
+                return _buildTrekListItem(
                   context,
-                  'Malam Hari di Desa',
+                  trackTitles[index],
                   'images/malam.png',
-                  'assets/audios/suaraAlam/malam/malam_didesa.mp3',
-                  '20.00',
-                  0),
-              _buildTrekListItem(
-                  context,
-                  'Malam dan Piano',
-                  'images/malam.png',
-                  'assets/audios/suaraAlam/malam/malam_piano.mp3',
-                  '23.00',
-                  1),
+                  audioUrls.isNotEmpty ? audioUrls[index] : '',
+                  durations[index],
+                  index,
+                );
+              }),
             ],
           ),
         ),
@@ -149,28 +186,30 @@ class _MalamTrackListState extends State<MalamTrackList> {
     );
   }
 
-  Widget _buildTrekListItem(BuildContext context, String title,
-      String imageAsset, String audioPath, String duration, int index) {
+  Widget _buildTrekListItem(
+    BuildContext context,
+    String title,
+    String imageAsset,
+    String audioUrl,
+    String duration,
+    int index,
+  ) {
     return GestureDetector(
       onTap: () {
-        Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder: (context) => PlayMeditation(
-              title: title,
-              imageAsset: imageAsset,
-              audioPaths: [
-                'assets/audios/suaraAlam/malam/malam_didesa.mp3',
-                'assets/audios/suaraAlam/malam/malam_piano.mp3',
-              ],
-              trackTitles: [
-                'Malam Hari di Desa',
-                'Malam dan Piano',
-              ],
-              selectedIndex: index,
+        if (audioUrls.isNotEmpty) {
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => PlayMeditation(
+                title: title,
+                imageAsset: imageAsset,
+                audioPaths: audioUrls,
+                trackTitles: trackTitles,
+                selectedIndex: index,
+              ),
             ),
-          ),
-        );
+          );
+        }
       },
       child: Container(
         margin: EdgeInsets.symmetric(vertical: 8),
@@ -187,28 +226,30 @@ class _MalamTrackListState extends State<MalamTrackList> {
               height: 70,
             ),
             SizedBox(width: 12),
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  title,
-                  style: TextStyle(
-                    fontFamily: 'Poppins',
-                    fontSize: 18,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.black,
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    title,
+                    style: TextStyle(
+                      fontFamily: 'Poppins',
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.black,
+                    ),
                   ),
-                ),
-                SizedBox(height: 2),
-                Text(
-                  'Durasi: $duration',
-                  style: TextStyle(
-                    fontFamily: 'Poppins',
-                    fontSize: 14,
-                    color: Colors.black,
+                  SizedBox(height: 2),
+                  Text(
+                    'Durasi: $duration',
+                    style: TextStyle(
+                      fontFamily: 'Poppins',
+                      fontSize: 14,
+                      color: Colors.black,
+                    ),
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
           ],
         ),

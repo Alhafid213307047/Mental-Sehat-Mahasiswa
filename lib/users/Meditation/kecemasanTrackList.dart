@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:connectivity_plus/connectivity_plus.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:mentalsehat/users/Meditation/playMeditation.dart';
 
@@ -14,18 +15,66 @@ class KecemasanTrackList extends StatefulWidget {
 class _KecemasanTrackListState extends State<KecemasanTrackList> {
   final Connectivity _connectivity = Connectivity();
   late StreamSubscription<ConnectivityResult> _connectivitySubscription;
-  final List<String> trackTitles = [];
+  final List<String> trackTitles = [
+    'Sesi 1 - Mengamati Sensasi Tubuh',
+    'Sesi 2 - Melepaskan Pikiran yang Menggangu',
+    'Sesi 3 - Mengamati Sensasi Tubuh (2)',
+    'Sesi 4 - Melatih Nafas Saat Cemas',
+    'Sesi 5 - Menemukan Ketenangan dalam Nafas',
+    'Sesi 6 - Melatih Nafas Saat Cemas (2)',
+    'Sesi 7 - Berfokus pada Diri Sendiri',
+  ];
+
+  final List<String> audioPaths = [
+    'mindfulness/kecemasan/kecemasan_sesi1.mp3',
+    'mindfulness/kecemasan/kecemasan_sesi2.mp3',
+    'mindfulness/kecemasan/kecemasan_sesi3.mp3',
+    'mindfulness/kecemasan/kecemasan_sesi4.mp3',
+    'mindfulness/kecemasan/kecemasan_sesi5.mp3',
+    'mindfulness/kecemasan/kecemasan_sesi6.mp3',
+    'mindfulness/kecemasan/kecemasan_sesi7.mp3',
+    
+  ];
+
+  final List<String> durations = [
+    '9.26',
+    '8.38',
+    '9.03',
+    '8.10',
+    '7.40',
+    '8.58',
+    '7.45',
+  ];
+
+  List<String> audioUrls = [];
 
   @override
   void initState() {
     super.initState();
-
     _connectivitySubscription = _connectivity.onConnectivityChanged.listen(
       (ConnectivityResult result) {
-        // Handle connectivity changes here if needed
         setState(() {}); // Trigger rebuild when connectivity changes
       },
     );
+
+    _loadAudioUrls();
+  }
+
+  Future<void> _loadAudioUrls() async {
+    List<String> urls = await getAudioUrls(audioPaths);
+    setState(() {
+      audioUrls = urls;
+    });
+  }
+
+  Future<List<String>> getAudioUrls(List<String> filePaths) async {
+    List<String> urls = [];
+    for (String path in filePaths) {
+      String downloadURL =
+          await FirebaseStorage.instance.ref(path).getDownloadURL();
+      urls.add(downloadURL);
+    }
+    return urls;
   }
 
   @override
@@ -41,11 +90,9 @@ class _KecemasanTrackListState extends State<KecemasanTrackList> {
       initialData: ConnectivityResult.mobile,
       builder: (context, snapshot) {
         if (snapshot.data == ConnectivityResult.none) {
-          // Tidak ada koneksi internet
           return _buildNoInternet();
         } else {
-          // Terdapat koneksi internet
-          return _buildKecemasanTrackList();
+          return _buildStresTrackList();
         }
       },
     );
@@ -97,7 +144,7 @@ class _KecemasanTrackListState extends State<KecemasanTrackList> {
     );
   }
 
-  Widget _buildKecemasanTrackList() {
+  Widget _buildStresTrackList() {
     return Scaffold(
       appBar: AppBar(
         title: Text(
@@ -138,64 +185,16 @@ class _KecemasanTrackListState extends State<KecemasanTrackList> {
                 textAlign: TextAlign.center,
               ),
               SizedBox(height: 16),
-              _buildTrekListItem(
-                context,
-                'Sesi 1 - Mengamati Sensasi Tubuh',
-                'images/kecemasan2.png',
-                'assets/audios/mindfulness/kecemasan/kecemasan_sesi1.mp3',
-                '9.26',
-                0,
-              ),
-              _buildTrekListItem(
-                context,
-                'Sesi 2 - Melepaskan Pikiran yang Menggangu',
-                'images/kecemasan2.png',
-                'assets/audios/mindfulness/kecemasan/kecemasan_sesi2.mp3',
-                '8.38',
-                1,
-              ),
-              _buildTrekListItem(
-                context,
-                'Sesi 3 - Mengamati Sensasi Tubuh (2)',
-                'images/kecemasan2.png',
-                'assets/audios/mindfulness/kecemasan/kecemasan_sesi3.mp3',
-                '9.03',
-                2,
-              ),
-              _buildTrekListItem(
-                context,
-                'Sesi 4 - Melatih Nafas Saat Cemas',
-                'images/kecemasan2.png',
-                'assets/audios/mindfulness/kecemasan/kecemasan_sesi4.mp3',
-                '8.10',
-                3,
-              ),
-              _buildTrekListItem(
-                context,
-                'Sesi 5 - Menemukan Ketenangan dalam Nafas',
-                'images/kecemasan2.png',
-                'assets/audios/mindfulness/kecemasan/kecemasan_sesi5.mp3',
-                '7.40',
-                4,
-              ),
-              _buildTrekListItem(
-                context,
-                'Sesi 6 - Melatih Nafas Saat Cemas (2)',
-                'images/kecemasan2.png',
-                'assets/audios/mindfulness/kecemasan/kecemasan_sesi6.mp3',
-                '8.58',
-                5,
-              ),
-              _buildTrekListItem(
-                context,
-                'Sesi 7 - Berfokus pada Diri Sendiri',
-                'images/kecemasan2.png',
-                'assets/audios/mindfulness/kecemasan/kecemasan_sesi7.mp3',
-                '7.45',
-                6,
-              ),
-              
-              // Tambahkan trek list lainnya jika diperlukan
+              ...List.generate(trackTitles.length, (index) {
+                return _buildTrekListItem(
+                  context,
+                  trackTitles[index],
+                  'images/kecemasan2.png',
+                  audioUrls.isNotEmpty ? audioUrls[index] : '',
+                  durations[index],
+                  index,
+                );
+              }),
             ],
           ),
         ),
@@ -207,40 +206,26 @@ class _KecemasanTrackListState extends State<KecemasanTrackList> {
     BuildContext context,
     String title,
     String imageAsset,
-    String audioPath,
+    String audioUrl,
     String duration,
     int index,
   ) {
     return GestureDetector(
       onTap: () {
-        Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder: (context) => PlayMeditation(
-              title: title,
-              imageAsset: imageAsset,
-              audioPaths: [
-                'assets/audios/mindfulness/kecemasan/kecemasan_sesi1.mp3',
-                'assets/audios/mindfulness/kecemasan/kecemasan_sesi2.mp3',
-                'assets/audios/mindfulness/kecemasan/kecemasan_sesi3.mp3',
-                'assets/audios/mindfulness/kecemasan/kecemasan_sesi4.mp3',
-                'assets/audios/mindfulness/kecemasan/kecemasan_sesi5.mp3',
-                'assets/audios/mindfulness/kecemasan/kecemasan_sesi6.mp3',
-                'assets/audios/mindfulness/kecemasan/kecemasan_sesi7.mp3',
-              ],
-              trackTitles: [
-                'Sesi 1 - Mengamati Sensasi Tubuh',
-                'Sesi 2 - Melepaskan Pikiran yang Menggangu',
-                'Sesi 3 - Mengamati Sensasi Tubuh (2)',
-                'Sesi 4 - Melatih Nafas Saat Cemas',
-                'Sesi 5 - Menemukan Ketenangan dalam Nafas',
-                'Sesi 6 - Melatih Nafas Saat Cemas (2)',
-                'Sesi 7 - Berfokus pada Diri Sendiri',
-              ],
-              selectedIndex: index,
+        if (audioUrls.isNotEmpty) {
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => PlayMeditation(
+                title: title,
+                imageAsset: imageAsset,
+                audioPaths: audioUrls,
+                trackTitles: trackTitles,
+                selectedIndex: index,
+              ),
             ),
-          ),
-        );
+          );
+        }
       },
       child: Container(
         margin: EdgeInsets.symmetric(vertical: 8),

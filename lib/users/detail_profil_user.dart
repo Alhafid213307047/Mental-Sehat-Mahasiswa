@@ -2,9 +2,9 @@ import 'dart:io';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_storage/firebase_storage.dart' as firebase_storage;
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:firebase_storage/firebase_storage.dart' as firebase_storage;
 
 class DetailProfileUser extends StatefulWidget {
   const DetailProfileUser({super.key});
@@ -435,7 +435,7 @@ class _DetailProfileUserState extends State<DetailProfileUser> {
     );
   }
 
-  Future<void> _uploadImage(File imageFile) async {
+ Future<void> _uploadImage(File imageFile) async {
     try {
       final user = FirebaseAuth.instance.currentUser;
       if (user != null) {
@@ -449,30 +449,37 @@ class _DetailProfileUserState extends State<DetailProfileUser> {
             .child(user.uid)
             .child(fileName);
 
+        // Mendapatkan URL gambar lama
+        String? oldImageUrl;
+        if (userData.containsKey('image')) {
+          oldImageUrl = userData['image'] as String?;
+        }
+
         // Mengunggah gambar ke Firebase Storage
         await ref.putFile(imageFile);
 
         // Mendapatkan URL gambar yang telah diunggah
         final imageUrl = await ref.getDownloadURL();
 
-        if (userData.containsKey('image')) {
-          // Jika sudah ada, gunakan update
-          await FirebaseFirestore.instance
-              .collection('Users')
-              .doc(user.uid)
-              .update({
+        // Memperbarui URL gambar di Firestore
+        await FirebaseFirestore.instance.collection('Users').doc(user.uid).set(
+          {
             'image': imageUrl,
-          });
-        } else {
-          // Jika belum ada, gunakan set
-          await FirebaseFirestore.instance.collection('Users').doc(user.uid).set(
-              {
-                'image': imageUrl,
-              },
-              SetOptions(merge:true)); // Gunakan SetOptions dengan merge true agar data yang ada tidak dihapus
+          },
+          SetOptions(merge: true),
+        );
+
+        // Menghapus gambar lama dari Firebase Storage
+        if (oldImageUrl != null && oldImageUrl.isNotEmpty) {
+          try {
+            final oldRef = firebase_storage.FirebaseStorage.instance.refFromURL(oldImageUrl);
+            await oldRef.delete();
+          } catch (e) {
+            print('Error deleting old image: $e');
+          }
         }
 
-         setState(() {
+        setState(() {
           // Update profileImageUrl dengan URL gambar baru
           profileImageUrl = imageUrl;
         });
