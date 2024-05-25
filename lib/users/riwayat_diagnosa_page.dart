@@ -78,6 +78,7 @@ class _RiwayatDiagnosaPageState extends State<RiwayatDiagnosaPage>
             fontWeight: FontWeight.bold,
           ),
         ),
+        automaticallyImplyLeading: false,
         bottom: TabBar(
           controller: _tabController,
           tabs: [
@@ -431,22 +432,18 @@ class _RiwayatDiagnosaPageState extends State<RiwayatDiagnosaPage>
   Stream<QuerySnapshot> _getDiagnosisStream() {
     User? user = FirebaseAuth.instance.currentUser;
     String userId = user?.uid ?? '';
-
     return FirebaseFirestore.instance
         .collection('Users')
         .doc(userId)
         .collection('HistoryDiagnosis')
         .snapshots();
   }
-
   String _formatDate(DateTime date) {
     return DateFormat('d MMMM y', 'id_ID').format(date);
   }
-
   String _formatTime(DateTime date) {
     return DateFormat.Hm('id_ID').format(date);
   }
-
   String _getImageAsset(String category, String resultCategory) {
     switch (category) {
       case 'Diagnosa Stres':
@@ -520,25 +517,19 @@ class _RiwayatDiagnosaPageState extends State<RiwayatDiagnosaPage>
   Stream<QuerySnapshot> _getMoodStream() {
     User? user = FirebaseAuth.instance.currentUser;
     String userId = user?.uid ?? '';
-
     return FirebaseFirestore.instance
         .collection('Users')
         .doc(userId)
         .collection('HistoryMood')
         .snapshots();
   }
-
   String _formatDateMood(DateTime date) {
     return DateFormat('EEEE, dd MMMM yyyy', 'id_ID').format(date);
   }
-
   String _formatTimeMood(DateTime date) {
     return DateFormat.Hm('id_ID').format(date);
   }
-
   String _getMoodImageAsset(String mood) {
-    // Define your image assets according to different moods
-    // Example:
     switch (mood) {
       case 'Baik':
         return 'images/baik.png';

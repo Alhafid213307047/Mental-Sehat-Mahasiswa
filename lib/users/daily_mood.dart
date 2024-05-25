@@ -64,7 +64,6 @@ class _DailyMoodState extends State<DailyMood> {
         formattedDate = DateFormat('EEEE, dd MMMM yyyy', 'id_ID').format(now);
         String formattedTime = "${now.hour.toString().padLeft(2, '0')}:${now.minute.toString().padLeft(2, '0')}";
         int timestamp = DateTime.now().millisecondsSinceEpoch;
-
         // Menyimpan data ke Firestore
         await FirebaseFirestore.instance
             .collection('Users')

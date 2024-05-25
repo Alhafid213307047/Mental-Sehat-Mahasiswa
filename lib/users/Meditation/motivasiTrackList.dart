@@ -41,14 +41,18 @@ class _MotivasiTrackListState extends State<MotivasiTrackList> {
       },
     );
 
-    _loadAudioUrls();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _loadAudioUrls();
+    });
   }
 
   Future<void> _loadAudioUrls() async {
+    showLoadingDialog();
     List<String> urls = await getAudioUrls(audioPaths);
     setState(() {
       audioUrls = urls;
     });
+    hideLoadingDialog();
   }
 
   Future<List<String>> getAudioUrls(List<String> filePaths) async {
@@ -59,6 +63,43 @@ class _MotivasiTrackListState extends State<MotivasiTrackList> {
       urls.add(downloadURL);
     }
     return urls;
+  }
+
+  void showLoadingDialog() {
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (BuildContext context) {
+        return Dialog(
+          child: Padding(
+            padding: const EdgeInsets.all(20),
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                CircularProgressIndicator(),
+                SizedBox(width: 20),
+                Expanded(
+                  child: Text(
+                    "sedang memuat aset, tunggu sebentar...",
+                    style: TextStyle(
+                      fontFamily: 'Poppins',
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        );
+      },
+    );
+  }
+
+  void hideLoadingDialog() {
+    Future.delayed(Duration(milliseconds: 500), () {
+      if (mounted) {
+        Navigator.of(context).pop();
+      }
+    });
   }
 
   @override

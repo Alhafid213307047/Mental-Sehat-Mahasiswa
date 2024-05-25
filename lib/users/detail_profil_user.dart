@@ -211,7 +211,8 @@ class _DetailProfileUserState extends State<DetailProfileUser> {
                       ),
                       child: ClipRRect(
                         borderRadius: BorderRadius.circular(60),
-                        child: profileImageUrl != null
+                        child: profileImageUrl != null &&
+                                profileImageUrl!.isNotEmpty
                             ? Image.network(
                                 profileImageUrl!,
                                 fit: BoxFit.cover,
@@ -349,18 +350,22 @@ class _DetailProfileUserState extends State<DetailProfileUser> {
             child: Container(
               width: 500,
               height: 500,
-              decoration: BoxDecoration(
-                image: DecorationImage(
-                  image: NetworkImage(profileImageUrl ?? ''),
-                  fit: BoxFit.cover,
-                ),
-              ),
+              child: profileImageUrl != null && profileImageUrl!.isNotEmpty
+                  ? Image.network(
+                      profileImageUrl!,
+                      fit: BoxFit.cover,
+                    )
+                  : Image.asset(
+                      'images/profil.jpg',
+                      fit: BoxFit.cover,
+                    ),
             ),
           ),
         );
       },
     );
   }
+
 
   void _showBottomSheet() {
     showModalBottomSheet(

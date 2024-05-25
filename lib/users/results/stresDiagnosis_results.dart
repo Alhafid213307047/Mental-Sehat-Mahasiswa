@@ -161,10 +161,8 @@ class _StressDiagnosisResultsState extends State<StressDiagnosisResults> {
       int timestamp = DateTime.now().millisecondsSinceEpoch;
       String formattedDate = "${_getDayName(now.weekday)}, ${now.day} ${_getMonthName(now.month)} ${now.year}";
       String formattedTime = "${now.hour.toString().padLeft(2, '0')}:${now.minute.toString().padLeft(2, '0')}";
-
       // Mengambil ID user yang sedang login
       User? user = FirebaseAuth.instance.currentUser;
-
       if (user != null) {
         String userId = user.uid;
         Map<String, dynamic> diagnosisData = {

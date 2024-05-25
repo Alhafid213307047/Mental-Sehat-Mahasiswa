@@ -76,7 +76,7 @@ class _PlayMeditationState extends State<PlayMeditation> {
       backgroundImage = 'images/park_animation.gif';
     } else if (widget.audioPaths.any((path) => path.contains('mindfulness')) &&
         widget.audioPaths.any((path) => path.contains('kecemasan'))) {
-      backgroundImage = 'images/sakura_animation.gif';
+      backgroundImage = 'images/sakura2_animation.gif';
     } else if (widget.audioPaths.any((path) => path.contains('mindfulness')) &&
         widget.audioPaths.any((path) => path.contains('tidur'))) {
       backgroundImage = 'images/night_animation.gif';
@@ -85,10 +85,10 @@ class _PlayMeditationState extends State<PlayMeditation> {
       backgroundImage = 'images/motivasi_animation.gif';
     } else if (widget.audioPaths.any((path) => path.contains('suaraAlam')) &&
         widget.audioPaths.any((path) => path.contains('hujan'))) {
-      backgroundImage = 'images/rain5_animation.gif';
+      backgroundImage = 'images/rain6_animation.gif';
     } else if (widget.audioPaths.any((path) => path.contains('suaraAlam')) &&
         widget.audioPaths.any((path) => path.contains('burung'))) {
-      backgroundImage = 'images/kicauan_burung.gif';
+      backgroundImage = 'images/kicauan_burung6.gif';
     } else if (widget.audioPaths.any((path) => path.contains('suaraAlam')) &&
         widget.audioPaths.any((path) => path.contains('ombak'))) {
       backgroundImage = 'images/ombak_animation.gif';
@@ -97,7 +97,7 @@ class _PlayMeditationState extends State<PlayMeditation> {
       backgroundImage = 'images/waterflow2_animation.gif';
     } else if (widget.audioPaths.any((path) => path.contains('suaraAlam')) &&
         widget.audioPaths.any((path) => path.contains('malam'))) {
-      backgroundImage = 'images/night2_animation.gif';
+      backgroundImage = 'images/night4_animation.gif';
     } else if (widget.audioPaths.any((path) => path.contains('religius'))) {
       backgroundImage = 'images/islamic.jpeg';
     } else {
@@ -115,6 +115,7 @@ class _PlayMeditationState extends State<PlayMeditation> {
 
   @override
   void dispose() {
+    audioPlayer.stop();
     audioPlayer.dispose();
     super.dispose();
   }
@@ -173,7 +174,7 @@ class _PlayMeditationState extends State<PlayMeditation> {
     }
   }
 
-  void _toggleAutoPlay() {
+  Future<void> _toggleAutoPlay() async {
     setState(() {
       isAutoPlayEnabled = !isAutoPlayEnabled;
     });
@@ -191,20 +192,19 @@ class _PlayMeditationState extends State<PlayMeditation> {
     );
 
     if (isAutoPlayEnabled) {
-      if (!isPlaying) {
-        _playNextIfAvailable();
-      } else {
-        audioPlayer.playlistAudioFinished.listen((audio) {
-          if (!audio.hasNext) {
-            _playNextIfAvailable();
-          }
-        });
-      }
+      await _playNextIfAvailableAfterCurrent();
+    }
+  }
+
+  Future<void> _playNextIfAvailableAfterCurrent() async {
+    final isPlaying = await audioPlayer.isPlaying.first;
+    if (!isPlaying) {
+      // Jika tidak ada audio yang sedang diputar, lanjutkan ke audio berikutnya
+      _playNextIfAvailable();
     } else {
-      audioPlayer.playlistAudioFinished.drain(); 
-      if (!isPlaying) {
-        audioPlayer.stop();
-      }
+      // Jika audio sedang diputar, tunggu hingga selesai, kemudian lanjutkan ke audio berikutnya
+      await audioPlayer.playlistAudioFinished.first;
+      _playNextIfAvailable();
     }
   }
 
@@ -216,13 +216,20 @@ class _PlayMeditationState extends State<PlayMeditation> {
         appBarTitle = currentTrackTitle;
       });
       _openAudio(currentIndex);
+    } else {
+      audioPlayer.stop();
     }
   }
 
-
   void _handleBackButton() {
-    audioPlayer.stop();
-    Navigator.pop(context);
+    if (isAutoPlayEnabled) {
+      isAutoPlayEnabled = false;
+      audioPlayer.stop();
+      Navigator.pop(context);
+    } else {
+      audioPlayer.stop();
+      Navigator.pop(context);
+    }
   }
 
   @override
@@ -265,19 +272,19 @@ class _PlayMeditationState extends State<PlayMeditation> {
                           fontWeight: FontWeight.bold,
                           fontSize: 18,
                           color:
-                              (backgroundImage == 'images/rain5_animation.gif' ||
+                              (backgroundImage == 'images/rain6_animation.gif' ||
                                       backgroundImage ==
                                           'images/islamic.jpeg' ||
                                       backgroundImage ==
                                           'images/kunang_animation.gif' ||
                                       backgroundImage ==
-                                          'images/sakura_animation.gif' ||
+                                          'images/sakura2_animation.gif' ||
                                       backgroundImage ==
                                           'images/ombak_animation.gif' ||
                                       backgroundImage ==
                                           'images/night_animation.gif' ||
                                       backgroundImage ==
-                                          'images/night2_animation.gif' ||
+                                          'images/night4_animation.gif' ||
                                       backgroundImage ==
                                           'images/waterflow2_animation.gif' ||
                                       backgroundImage ==
@@ -324,19 +331,19 @@ class _PlayMeditationState extends State<PlayMeditation> {
                               fontFamily: 'Poppins',
                               fontSize: 16,
                               color:
-                                  (backgroundImage == 'images/rain5_animation.gif' ||
+                                  (backgroundImage == 'images/rain6_animation.gif' ||
                                           backgroundImage ==
                                               'images/islamic.jpeg' ||
                                           backgroundImage ==
                                               'images/kunang_animation.gif' ||
                                           backgroundImage ==
-                                              'images/sakura_animation.gif' ||
+                                              'images/sakura2_animation.gif' ||
                                           backgroundImage ==
                                               'images/ombak_animation.gif' ||
                                           backgroundImage ==
                                               'images/night_animation.gif' ||
                                           backgroundImage ==
-                                              'images/night2_animation.gif' ||
+                                              'images/night4_animation.gif' ||
                                           backgroundImage ==
                                               'images/waterflow2_animation.gif' ||
                                           backgroundImage ==

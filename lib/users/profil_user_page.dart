@@ -168,6 +168,7 @@ class _ProfileUserPageState extends State<ProfileUserPage> {
             fontWeight: FontWeight.bold,
           ),
         ),
+        automaticallyImplyLeading: false,
       ),
       body: Padding(
         padding: EdgeInsets.all(15.0),

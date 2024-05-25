@@ -298,7 +298,7 @@ class _IntroductionPageState extends State<IntroductionPage> {
     );
   }
 
- // Fungsi untuk memilih tanggal
+  // Fungsi untuk memilih tanggal
   Future<void> _selectDate(BuildContext context) async {
     final DateTime? pickedDate = await showDatePicker(
       context: context,
@@ -338,13 +338,16 @@ class _IntroductionPageState extends State<IntroductionPage> {
   void _saveDataToUsers() async {
     String nama = _namaController.text.trim();
     String agama = _selectedAgama;
-    String? tanggal = _tanggalController.text.trim(); // Biarkan sebagai String
-
-    // Validasi input
-
+    String? tanggal = _tanggalController.text.trim();
     // Konversi tanggal ke DateTime
     DateTime? birthDate = _selectedDate;
 
+    //Validasi Data
+    if (nama.isEmpty || agama.isEmpty || tanggal == null || birthDate == null) {
+      // Menampilkan pesan kesalahan jika ada variabel yang kosong
+      showErrorSnackbar('Semua data harus diisi');
+      return;
+    }
     // Hitung usia
     DateTime now = DateTime.now();
     int age = now.year - birthDate!.year;
@@ -353,7 +356,6 @@ class _IntroductionPageState extends State<IntroductionPage> {
       age--;
     }
     int umur = age;
-
     // Tampilkan indikator loading
     showDialog(
       context: context,
@@ -388,4 +390,15 @@ class _IntroductionPageState extends State<IntroductionPage> {
     }
   }
 
+  void showErrorSnackbar(String message) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(
+          message,
+          style: TextStyle(fontFamily: 'Poppins'),
+        ),
+        backgroundColor: Colors.red,
+      ),
+    );
+  }
 }

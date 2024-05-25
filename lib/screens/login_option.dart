@@ -52,13 +52,11 @@ class _LoginOptionState extends State<LoginOption> {
       // Membuka dialog Google Sign-In
       final GoogleSignInAccount? googleSignInAccount =
           await googleSignIn.signIn();
-
       // Mengecek apakah pengguna berhasil memilih akun Google
       if (googleSignInAccount == null) {
         // User membatalkan login Google Sign-In
         return null;
       }
-
       // Mengautentikasi ke Firebase menggunakan Google Sign-In
       final GoogleSignInAuthentication googleSignInAuthentication =
           await googleSignInAccount.authentication;
@@ -66,14 +64,11 @@ class _LoginOptionState extends State<LoginOption> {
         accessToken: googleSignInAuthentication.accessToken,
         idToken: googleSignInAuthentication.idToken,
       );
-
       // SignIn dengan credential
       UserCredential userCredential =
           await _auth.signInWithCredential(credential);
-
       // Mendapatkan ID Google pengguna yang berhasil masuk
       String googleUserId = userCredential.user!.uid;
-
       // Mengecek apakah ID Google sudah terdaftar di koleksi "Users"
       bool isUser = await _checkUserRegistrationWithGoogle(googleUserId);
       // Redirect ke halaman yang sesuai
@@ -133,34 +128,47 @@ class _LoginOptionState extends State<LoginOption> {
 
   Future signIn() async {
     try {
-      print('Email yang dimasukkan: ${_emailController.text}');
-      print('Password yang dimasukkan: ${_passwordController.text}');
+      String email = _emailController.text;
+      String password = _passwordController.text;
 
-      if (_emailController.text.isEmpty) {
+      // Validasi input
+      final emailRegExp = RegExp(r'^[\w-]+(\.[\w-]+)*@([\w-]+\.)+[a-zA-Z]{2,7}$');
+      if (email.isEmpty) {
         showErrorSnackbar('Email harus diisi');
         return;
       }
-
-      if (_passwordController.text.isEmpty) {
+      if (!emailRegExp.hasMatch(email)) {
+        showErrorSnackbar('Format email tidak valid');
+        return;
+      }
+      if (password.isEmpty) {
         showErrorSnackbar('Password harus diisi');
         return;
       }
+      if (password.length < 8) {
+        showErrorSnackbar('Password harus terdiri dari minimal 8 karakter');
+        return;
+      }
 
+      // Melakukan sign in dengan Firebase Authentication
       UserCredential userCredential =
           await FirebaseAuth.instance.signInWithEmailAndPassword(
-        email: _emailController.text,
-        password: _passwordController.text,
+        email: email,
+        password: password,
       );
-
       // Mendapatkan UID pengguna yang berhasil masuk
       String userId = userCredential.user!.uid;
-
       // Mengecek apakah UID sudah terdaftar di koleksi "pakar"
       bool isPakar = await _checkUserRegistrationInPakarCollection(userId);
       bool isUser = await _checkUserRegistrationInUsersCollection(userId);
 
       // Redirect ke halaman yang sesuai
       if (isPakar) {
+        if (!userCredential.user!.emailVerified) {
+          showErrorSnackbar(
+              'Email anda belum terverifikasi. Silahkan cek email anda untuk verifikasi terlebih dahulu');
+          return;
+        }
         showLoadingAndNavigate(PakarPage());
       } else if (isUser) {
         // Mengecek apakah email pengguna sudah diverifikasi
@@ -200,7 +208,6 @@ class _LoginOptionState extends State<LoginOption> {
         );
       },
     );
-
     await Future.delayed(Duration(seconds: 2));
     Navigator.pop(context);
 

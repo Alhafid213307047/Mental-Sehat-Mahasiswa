@@ -56,7 +56,6 @@ class _QuestionStresState extends State<QuestionStres> {
           .collection('Stres')
           .orderBy('kode')
           .get();
-
       if (querySnapshot.docs.isNotEmpty) {
         setState(() {
           _totalQuestions = querySnapshot.docs.length;
