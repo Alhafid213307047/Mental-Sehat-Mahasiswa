@@ -3,7 +3,10 @@ import 'dart:async';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
+import 'package:mentalsehat/users/Meditation/afirmasiTrackList.dart';
+import 'package:mentalsehat/users/Meditation/stresTrackList.dart';
 import 'package:mentalsehat/users/answer/user_answer.dart';
 import 'package:mentalsehat/users/solution/depresi_solution.dart';
 
@@ -368,6 +371,73 @@ class _DepresiDiagnosisResultsState extends State<DepresiDiagnosisResults> {
                 style: TextStyle(
                   fontFamily: 'Poppins',
                   fontSize: 16,
+                ),
+              ),
+              SizedBox(height: 12),
+              RichText(
+                text: TextSpan(
+                  style: TextStyle(
+                    fontFamily: 'Poppins',
+                    fontSize: 14,
+                    color: Colors.black, // Set the text color
+                  ),
+                  children: [
+                    TextSpan(
+                      text:
+                          "Cobalah melakukan meditasi mindfulness 'Mengurangi Stres' ",
+                    ),
+                    TextSpan(
+                      text: 'Disini',
+                      style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.blue,
+                        decoration: TextDecoration.underline,
+                      ),
+                      recognizer: TapGestureRecognizer()
+                        ..onTap = () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => StresTrackList(),
+                            ),
+                          );
+                        },
+                    ),
+                  ],
+                ),
+              ),
+              RichText(
+                text: TextSpan(
+                  style: TextStyle(
+                    fontFamily: 'Poppins',
+                    fontSize: 14,
+                    color: Colors.black, // Set the text color
+                  ),
+                  children: [
+                    TextSpan(
+                      text:
+                          "Cobalah melakukan meditasi mindfulness 'Afirmasi Diri' ",
+                    ),
+                    TextSpan(
+                      text: 'Disini',
+                      style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.blue,
+                        decoration: TextDecoration.underline,
+                      ),
+                      recognizer: TapGestureRecognizer()
+                        ..onTap = () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => AfirmasiTrackList(),
+                            ),
+                          );
+                        },
+                    ),
+                  ],
                 ),
               ),
               Column(

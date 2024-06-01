@@ -251,7 +251,7 @@ class _RiwayatDiagnosaPageState extends State<RiwayatDiagnosaPage>
                                 ),
                                 SizedBox(height: 4),
                                 Text(
-                                  'Tanggal: ${_formatDate(diagnosisDate)}',
+                                  'Tanggal: ${data['date']}',
                                   style: TextStyle(
                                     fontFamily: 'Poppins',
                                   ),

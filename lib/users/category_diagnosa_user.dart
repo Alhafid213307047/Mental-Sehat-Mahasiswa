@@ -1,6 +1,7 @@
 import 'dart:async';
-
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:connectivity_plus/connectivity_plus.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:mentalsehat/users/question/question_depresi.dart';
 import 'package:mentalsehat/users/question/question_kecemasan.dart';
@@ -50,7 +51,7 @@ class _CategoryDiagnosaUserState extends State<CategoryDiagnosaUser> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        'Apakah kamu sudah siap untuk melakukan diagnosa $category?',
+                        'Apakah kamu sudah siap untuk melakukan $category?',
                         style: TextStyle(
                           fontFamily: 'Poppins',
                           fontSize: 18,
@@ -73,20 +74,22 @@ class _CategoryDiagnosaUserState extends State<CategoryDiagnosaUser> {
               onPressed: () {
                 Navigator.of(context).pop();
               },
-              child: Text('Tidak',
-               style: TextStyle(
+              child: Text(
+                'Tidak',
+                style: TextStyle(
                   fontFamily: 'Poppins',
                   fontSize: 18,
                 ),
               ),
             ),
             TextButton(
-              onPressed: () {
+              onPressed: () async {
                 Navigator.of(context).pop();
-                onConfirm();
+                await _checkAndProceed(category, onConfirm);
               },
-              child: Text('Ya',
-               style: TextStyle(
+              child: Text(
+                'Ya',
+                style: TextStyle(
                   fontFamily: 'Poppins',
                   fontSize: 18,
                 ),
@@ -96,6 +99,97 @@ class _CategoryDiagnosaUserState extends State<CategoryDiagnosaUser> {
         );
       },
     );
+  }
+
+  Future<void> _checkAndProceed(String label, VoidCallback onConfirm) async {
+    User? user = FirebaseAuth.instance.currentUser;
+    if (user != null) {
+      String userId = user.uid;
+      DateTime now = DateTime.now();
+      String formattedDate =
+          "${_getDayName(now.weekday)}, ${now.day} ${_getMonthName(now.month)} ${now.year}";
+
+      QuerySnapshot snapshot = await FirebaseFirestore.instance
+          .collection('Users')
+          .doc(userId)
+          .collection('HistoryDiagnosis')
+          .get();
+
+      bool alreadyDiagnosedToday = false;
+      for (var doc in snapshot.docs) {
+        var data = doc.data() as Map<String, dynamic>;
+        if (data['category'] == label && data['date'] == formattedDate) {
+          alreadyDiagnosedToday = true;
+          break;
+        }
+      }
+
+      if (alreadyDiagnosedToday) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(
+              'Maaf anda sudah melakukan $label pada hari ini, kembalilah pada lain hari yaa :)',
+              style: TextStyle(fontFamily: 'Poppins'),
+            ),
+            backgroundColor: Colors.red,
+          ),
+        );
+      } else {
+        onConfirm();
+      }
+    }
+  }
+
+  String _getMonthName(int month) {
+    switch (month) {
+      case 1:
+        return 'Januari';
+      case 2:
+        return 'Februari';
+      case 3:
+        return 'Maret';
+      case 4:
+        return 'April';
+      case 5:
+        return 'Mei';
+      case 6:
+        return 'Juni';
+      case 7:
+        return 'Juli';
+      case 8:
+        return 'Agustus';
+      case 9:
+        return 'September';
+      case 10:
+        return 'Oktober';
+      case 11:
+        return 'November';
+      case 12:
+        return 'Desember';
+      default:
+        return '';
+    }
+  }
+
+  String _getDayName(int day) {
+    switch (day) {
+      case DateTime.sunday:
+        return 'Minggu';
+      case DateTime.monday:
+        return 'Senin';
+      case DateTime.tuesday:
+        return 'Selasa';
+      case DateTime.wednesday:
+        return 'Rabu';
+      case DateTime.thursday:
+        return 'Kamis';
+      case DateTime.friday:
+        return 'Jumat';
+      case DateTime.saturday:
+        return 'Sabtu';
+      default:
+        return '';
+    }
   }
 
   @override
@@ -187,7 +281,7 @@ class _CategoryDiagnosaUserState extends State<CategoryDiagnosaUser> {
                 label: 'Diagnosa Stres',
                 image: 'images/stres.png',
                 onPressed: () {
-                  _showConfirmationDialog('stres', () {
+                  _showConfirmationDialog('Diagnosa Stres', () {
                     Navigator.push(
                       context,
                       MaterialPageRoute(
@@ -202,7 +296,7 @@ class _CategoryDiagnosaUserState extends State<CategoryDiagnosaUser> {
                 label: 'Diagnosa Depresi',
                 image: 'images/depresi.png',
                 onPressed: () {
-                  _showConfirmationDialog('Depresi', () {
+                  _showConfirmationDialog('Diagnosa Depresi', () {
                     Navigator.push(
                       context,
                       MaterialPageRoute(
@@ -217,7 +311,7 @@ class _CategoryDiagnosaUserState extends State<CategoryDiagnosaUser> {
                 label: 'Diagnosa Kecemasan',
                 image: 'images/kecemasan.png',
                 onPressed: () {
-                  _showConfirmationDialog('Kecemasan', () {
+                  _showConfirmationDialog('Diagnosa Kecemasan', () {
                     Navigator.push(
                       context,
                       MaterialPageRoute(
@@ -252,13 +346,15 @@ class _CategoryDiagnosaUserState extends State<CategoryDiagnosaUser> {
             width: 80,
             height: 80,
           ),
-          SizedBox(width: 16),
-          Text(
-            label,
-            style: TextStyle(
-              color: Colors.white,
-              fontSize: 18,
-              fontFamily: 'Poppins',
+          SizedBox(width: 20),
+          Expanded(
+            child: Text(
+              label,
+              style: TextStyle(
+                fontFamily: 'Poppins',
+                fontSize: 20,
+                color: Colors.white,
+              ),
             ),
           ),
         ],

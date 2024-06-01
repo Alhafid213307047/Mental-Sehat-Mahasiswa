@@ -21,7 +21,9 @@ class MeditationPage extends StatefulWidget {
   _MeditationPageState createState() => _MeditationPageState();
 }
 
-class _MeditationPageState extends State<MeditationPage> {
+class _MeditationPageState extends State<MeditationPage>
+    with SingleTickerProviderStateMixin {
+  late TabController _tabController;
   String selectedCategory = 'mindfulness';
   final Connectivity _connectivity = Connectivity();
   late StreamSubscription<ConnectivityResult> _connectivitySubscription;
@@ -29,22 +31,21 @@ class _MeditationPageState extends State<MeditationPage> {
   @override
   void initState() {
     super.initState();
-
-    _connectivitySubscription = _connectivity.onConnectivityChanged.listen(
-      (ConnectivityResult result) {
-        // Handle connectivity changes here if needed
-        setState(() {}); // Trigger rebuild when connectivity changes
-      },
-    );
+    _tabController = TabController(length: 3, vsync: this);
+    _connectivitySubscription =
+        _connectivity.onConnectivityChanged.listen((ConnectivityResult result) {
+      setState(() {}); // Trigger rebuild when connectivity changes
+    });
   }
 
   @override
   void dispose() {
     _connectivitySubscription.cancel();
+    _tabController.dispose();
     super.dispose();
   }
 
-  @override
+ @override
   Widget build(BuildContext context) {
     return StreamBuilder<ConnectivityResult>(
       stream: _connectivity.onConnectivityChanged,
@@ -55,7 +56,103 @@ class _MeditationPageState extends State<MeditationPage> {
           return _buildNoInternet();
         } else {
           // Terdapat koneksi internet
-          return _buildMeditationPage();
+          return Scaffold(
+            appBar: AppBar(
+              title: Text(
+                'Meditasi',
+                style: TextStyle(
+                  fontFamily: 'Poppins',
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              leading: IconButton(
+                icon: Icon(Icons.arrow_back),
+                onPressed: () {
+                  Navigator.pop(context);
+                },
+              ),
+              bottom: TabBar(
+                controller: _tabController,
+                tabs: [
+                  Tab(
+                    child: Row(
+                      children: [
+                        Image.asset(
+                          'images/mind.png',
+                          width: 24,
+                          height: 24,
+                          color: Color(0xFF04558F),
+                        ),
+                        SizedBox(width: 4),
+                        Text(
+                          'Mindfulness',
+                          style: TextStyle(
+                            fontFamily: 'Poppins',
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  Tab(
+                    child: Row(
+                      children: [
+                        Image.asset(
+                          'images/nature.png',
+                          width: 24,
+                          height: 24,
+                          color: Color(0xFF04558F),
+                        ),
+                        SizedBox(width: 4),
+                        Text(
+                          'Suara Alam',
+                          style: TextStyle(
+                            fontFamily: 'Poppins',
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  FutureBuilder<bool>(
+                    future: _isUserIslam(),
+                    builder: (context, snapshot) {
+                      final bool isUserIslam = snapshot.data ?? false;
+                      if (isUserIslam) {
+                        return Tab(
+                          child: Row(
+                            children: [
+                              Image.asset(
+                                'images/religius.png',
+                                width: 24,
+                                height: 24,
+                                color: Color(0xFF04558F),
+                              ),
+                              SizedBox(width: 4),
+                              Text(
+                                'Religius',
+                                style: TextStyle(
+                                  fontFamily: 'Poppins',
+                                ),
+                              ),
+                            ],
+                          ),
+                        );
+                      } else {
+                        return Container(); // Tidak menampilkan tab jika bukan Islam
+                      }
+                    },
+                  ),
+                ],
+              ),
+            ),
+            body: TabBarView(
+              controller: _tabController,
+              children: [
+                _buildMindfulnessContent(),
+                _buildNatureContent(),
+                _buildReligiousContent(),
+              ],
+            ),
+          );
         }
       },
     );
@@ -107,135 +204,6 @@ class _MeditationPageState extends State<MeditationPage> {
     );
   }
 
-  Widget _buildMeditationPage() {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text(
-          'Meditasi',
-          style: TextStyle(
-            fontFamily: 'Poppins',
-            fontWeight: FontWeight.bold,
-          ),
-        ),
-        leading: IconButton(
-          icon: Icon(Icons.arrow_back),
-          onPressed: () {
-            Navigator.pop(context);
-          },
-        ),
-      ),
-      body: Padding(
-        padding: const EdgeInsets.only(top: 6, bottom: 6, right: 12, left: 12),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            SingleChildScrollView(
-              scrollDirection: Axis.horizontal,
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                children: [
-                  _buildCategoryButton('mindfulness', 'Mindfulness'),
-                  _buildCategoryButton('nature', 'Suara Alam'),
-                  FutureBuilder<bool>(
-                    future: _isUserIslam(),
-                    builder: (context, snapshot) {
-                      if (snapshot.connectionState == ConnectionState.waiting) {
-                        return Container(); // Menampilkan tombol ketika tunggu hasil
-                      } else {
-                        if (snapshot.hasError) {
-                          // Tangani kesalahan jika ada
-                          return Text('Error: ${snapshot.error}');
-                        } else {
-                          final bool isUserIslam = snapshot.data ?? false;
-                          if (isUserIslam) {
-                            return _buildCategoryButton(
-                                'religious', 'Trek Religius');
-                          } else {
-                            return Container(); // Tidak menampilkan tombol jika bukan Islam
-                          }
-                        }
-                      }
-                    },
-                  ),
-                ],
-              ),
-            ),
-            if (selectedCategory == 'mindfulness')
-              _buildMindfulnessContent()
-            else if (selectedCategory == 'nature')
-              _buildNatureContent()
-            else if (selectedCategory == 'religious')
-              _buildReligiousContent()
-            else
-              Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  SizedBox(height: 300),
-                  Center(
-                    child: Text(
-                      'Belum ada trek meditasi $selectedCategory',
-                      style: TextStyle(
-                        fontFamily: 'Poppins',
-                        fontSize: 16,
-                        color: Colors.black,
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildCategoryButton(String category, String label) {
-    String iconImage = '';
-    switch (category) {
-      case 'mindfulness':
-        iconImage = 'images/mind.png';
-        break;
-      case 'nature':
-        iconImage = 'images/nature.png';
-        break;
-      case 'religious':
-        iconImage = 'images/religius.png';
-        break;
-      default:
-        iconImage =
-            'images/default.png'; 
-    }
-
-    return Padding(
-      padding: const EdgeInsets.only(right: 8.0),
-      child: ElevatedButton.icon(
-        onPressed: () {
-          setState(() {
-            selectedCategory = category;
-          });
-        },
-        icon: Image.asset(
-          iconImage,
-          width: 24, 
-          height: 24, 
-          color:
-              selectedCategory == category ? Colors.white : Color(0xFF04558F),
-        ),
-        label: Text(
-          label,
-          style: TextStyle(
-            fontFamily: 'Poppins',
-            color:
-                selectedCategory == category ? Colors.white : Color(0xFF04558F),
-          ),
-        ),
-        style: ElevatedButton.styleFrom(
-          primary: selectedCategory == category ? Colors.blue : null,
-        ),
-      ),
-    );
-  }
-
   Widget _buildContentItem1(String imagePath, String text, Function() onTapAction) {
     return Expanded(
       child: GestureDetector(
@@ -260,13 +228,13 @@ class _MeditationPageState extends State<MeditationPage> {
             SizedBox(height: 8),
             Container(
               // Menggunakan container untuk mengatur tinggi teks agar setara dengan gambar
-              height: 30,
+              height: 35,
               child: Text(
                 text,
                 textAlign: TextAlign.center,
                 style: TextStyle(
                   fontFamily: 'Poppins',
-                  fontSize: 13,
+                  fontSize: 12,
                   color: Colors.black,
                 ),
               ),
@@ -362,6 +330,7 @@ class _MeditationPageState extends State<MeditationPage> {
               }),
             ],
           ),
+          SizedBox(height: 10,),
          Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
@@ -419,7 +388,7 @@ class _MeditationPageState extends State<MeditationPage> {
               'AlQuran (Religius)',
               style: TextStyle(
                 fontFamily: 'Poppins',
-                fontSize: 13,
+                fontSize: 12,
                 color: Colors.black,
               ),
             ),

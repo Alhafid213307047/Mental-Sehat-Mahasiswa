@@ -158,13 +158,17 @@ class _LoginOptionState extends State<LoginOption> {
       );
       // Mendapatkan UID pengguna yang berhasil masuk
       String userId = userCredential.user!.uid;
+
       // Mengecek apakah UID sudah terdaftar di koleksi "pakar"
-      bool isPakar = await _checkUserRegistrationInPakarCollection(userId);
+      Map<String, dynamic> pakarData =
+          await _checkUserRegistrationInPakarCollection(userId);
+      bool isPakar = pakarData.isNotEmpty;
       bool isUser = await _checkUserRegistrationInUsersCollection(userId);
 
       // Redirect ke halaman yang sesuai
       if (isPakar) {
-        if (!userCredential.user!.emailVerified) {
+        String key = pakarData['key'] ?? '';
+        if (key != 'Super Pakar' && !userCredential.user!.emailVerified) {
           showErrorSnackbar(
               'Email anda belum terverifikasi. Silahkan cek email anda untuk verifikasi terlebih dahulu');
           return;
@@ -233,18 +237,24 @@ class _LoginOptionState extends State<LoginOption> {
     Navigator.pop(context);
   }
 
-  Future<bool> _checkUserRegistrationInPakarCollection(String userId) async {
+ Future<Map<String, dynamic>> _checkUserRegistrationInPakarCollection(
+      String userId) async {
     try {
       // Mengecek apakah UID sudah ada di koleksi "pakar"
       DocumentSnapshot userSnapshot =
           await _firestore.collection('pakar').doc(userId).get();
 
-      return userSnapshot.exists;
+      if (userSnapshot.exists) {
+        return userSnapshot.data() as Map<String, dynamic>;
+      } else {
+        return {};
+      }
     } catch (error) {
       print('Error checking user registration in "pakar" collection: $error');
-      return false;
+      return {};
     }
   }
+
 
   Future<bool> _checkUserRegistrationInUsersCollection(String userId) async {
     try {

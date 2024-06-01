@@ -119,171 +119,168 @@ class _IntroductionPageState extends State<IntroductionPage> {
 
   Widget _buildIntroductionPage() {
     return Scaffold(
-      body: Center(
-        child: Padding(
-          padding:
-              const EdgeInsets.only(left: 16, right: 16, top: 100, bottom: 16),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                'Halo sahabat mental sehat',
-                style: TextStyle(
-                  fontFamily: 'Poppins',
-                  fontSize: 24,
-                  fontWeight: FontWeight.bold,
+      body: SingleChildScrollView(
+        child: Center(
+          child: Padding(
+            padding: const EdgeInsets.only(
+                left: 16, right: 16, top: 100, bottom: 16),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  'Halo sahabat mental sehat',
+                  style: TextStyle(
+                    fontFamily: 'Poppins',
+                    fontSize: 24,
+                    fontWeight: FontWeight.bold,
+                  ),
                 ),
-              ),
-              SizedBox(height: 15),
-              Row(
-                children: [
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          'Perkenalkan diri kamu dulu yuk, agar kami bisa menegenalmu',
-                          style: TextStyle(
-                            fontFamily: 'Poppins',
-                            fontSize: 18,
+                SizedBox(height: 15),
+                Row(
+                  children: [
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            'Perkenalkan diri kamu dulu yuk, agar kami bisa menegenalmu',
+                            style: TextStyle(
+                              fontFamily: 'Poppins',
+                              fontSize: 18,
+                            ),
                           ),
-                        ),
-                      ],
+                        ],
+                      ),
                     ),
-                  ),
-                  Image.asset(
-                    'images/welcome.png',
-                    width: 100,
-                    height: 100,
-                  ),
-                ],
-              ),
-              SizedBox(height: 56),
-              Expanded(
-                child: SingleChildScrollView(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      TextFormField(
-                        controller: _namaController,
-                        decoration: InputDecoration(
-                          labelText: 'Nama Panggilan',
-                          labelStyle: TextStyle(
-                            fontFamily: 'Poppins',
-                          ),
-                          enabledBorder: OutlineInputBorder(
-                            borderSide: BorderSide(color: Color(0xFF04558F)),
-                            borderRadius: BorderRadius.circular(8.0),
-                          ),
-                          focusedBorder: OutlineInputBorder(
-                            borderSide: BorderSide(color: Color(0xFF04558F)),
-                            borderRadius: BorderRadius.circular(8.0),
-                          ),
-                        ),
-                      ),
-                      SizedBox(height: 25),
-                      DropdownButtonFormField(
-                        // Form untuk jenis kelamin
-                        value: null,
-                        items: [
-                          'Laki-laki',
-                          'Perempuan',
-                        ].map((gender) {
-                          return DropdownMenuItem(
-                            value: gender,
-                            child: Text(
-                              gender,
-                              style: TextStyle(fontFamily: 'Poppins'),
-                            ),
-                          );
-                        }).toList(),
-                        onChanged: (newValue) {
-                          setState(() {
-                            _selectedGender = newValue.toString();
-                          });
-                        },
-                        decoration: InputDecoration(
-                          labelText: 'Jenis Kelamin',
-                          labelStyle: TextStyle(
-                            fontFamily: 'Poppins',
-                          ),
-                          enabledBorder: OutlineInputBorder(
-                            borderSide: BorderSide(color: Color(0xFF04558F)),
-                            borderRadius: BorderRadius.circular(8.0),
-                          ),
-                          focusedBorder: OutlineInputBorder(
-                            borderSide: BorderSide(color: Color(0xFF04558F)),
-                            borderRadius: BorderRadius.circular(8.0),
-                          ),
-                        ),
-                      ),
-                      SizedBox(height: 25),
-                      TextFormField(
-                        controller: _tanggalController,
-                        readOnly: true, // Set inputan tidak dapat diedit
-                        onTap: () {
-                          _selectDate(
-                              context); // Panggil metode untuk menampilkan date picker
-                        },
-                        decoration: InputDecoration(
-                          labelText: 'Tanggal Lahir (dd/mm/yyyy)',
-                          labelStyle: TextStyle(
-                            fontFamily: 'Poppins',
-                          ),
-                          enabledBorder: OutlineInputBorder(
-                            borderSide: BorderSide(color: Color(0xFF04558F)),
-                            borderRadius: BorderRadius.circular(8.0),
-                          ),
-                          focusedBorder: OutlineInputBorder(
-                            borderSide: BorderSide(color: Color(0xFF04558F)),
-                            borderRadius: BorderRadius.circular(8.0),
-                          ),
-                        ),
-                      ),
-                      SizedBox(height: 25),
-                      DropdownButtonFormField(
-                        value: _selectedAgama,
-                        items: [
-                          'Islam',
-                          'Kristen Protestan',
-                          'Kristen Katolik',
-                          'Hindu',
-                          'Buddha',
-                          'Konghucu',
-                        ].map((agama) {
-                          return DropdownMenuItem(
-                            value: agama,
-                            child: Text(
-                              agama,
-                              style: TextStyle(fontFamily: 'Poppins'),
-                            ),
-                          );
-                        }).toList(),
-                        onChanged: (newValue) {
-                          setState(() {
-                            _selectedAgama = newValue.toString();
-                          });
-                        },
-                        decoration: InputDecoration(
-                          labelText: 'Agama',
-                          labelStyle: TextStyle(
-                            fontFamily: 'Poppins',
-                          ),
-                          enabledBorder: OutlineInputBorder(
-                            borderSide: BorderSide(color: Color(0xFF04558F)),
-                            borderRadius: BorderRadius.circular(8.0),
-                          ),
-                          focusedBorder: OutlineInputBorder(
-                            borderSide: BorderSide(color: Color(0xFF04558F)),
-                            borderRadius: BorderRadius.circular(8.0),
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
+                    Image.asset(
+                      'images/welcome.png',
+                      width: 100,
+                      height: 100,
+                    ),
+                  ],
                 ),
-              ),
-            ],
+                SizedBox(height: 56),
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    TextFormField(
+                      controller: _namaController,
+                      decoration: InputDecoration(
+                        labelText: 'Nama Panggilan',
+                        labelStyle: TextStyle(
+                          fontFamily: 'Poppins',
+                        ),
+                        enabledBorder: OutlineInputBorder(
+                          borderSide: BorderSide(color: Color(0xFF04558F)),
+                          borderRadius: BorderRadius.circular(8.0),
+                        ),
+                        focusedBorder: OutlineInputBorder(
+                          borderSide: BorderSide(color: Color(0xFF04558F)),
+                          borderRadius: BorderRadius.circular(8.0),
+                        ),
+                      ),
+                    ),
+                    SizedBox(height: 25),
+                    DropdownButtonFormField(
+                      value: null,
+                      items: [
+                        'Laki-laki',
+                        'Perempuan',
+                      ].map((gender) {
+                        return DropdownMenuItem(
+                          value: gender,
+                          child: Text(
+                            gender,
+                            style: TextStyle(fontFamily: 'Poppins'),
+                          ),
+                        );
+                      }).toList(),
+                      onChanged: (newValue) {
+                        setState(() {
+                          _selectedGender = newValue.toString();
+                        });
+                      },
+                      decoration: InputDecoration(
+                        labelText: 'Jenis Kelamin',
+                        labelStyle: TextStyle(
+                          fontFamily: 'Poppins',
+                        ),
+                        enabledBorder: OutlineInputBorder(
+                          borderSide: BorderSide(color: Color(0xFF04558F)),
+                          borderRadius: BorderRadius.circular(8.0),
+                        ),
+                        focusedBorder: OutlineInputBorder(
+                          borderSide: BorderSide(color: Color(0xFF04558F)),
+                          borderRadius: BorderRadius.circular(8.0),
+                        ),
+                      ),
+                    ),
+                    SizedBox(height: 25),
+                    TextFormField(
+                      controller: _tanggalController,
+                      readOnly: true,
+                      onTap: () {
+                        _selectDate(context);
+                      },
+                      decoration: InputDecoration(
+                        labelText: 'Tanggal Lahir (dd/mm/yyyy)',
+                        labelStyle: TextStyle(
+                          fontFamily: 'Poppins',
+                        ),
+                        enabledBorder: OutlineInputBorder(
+                          borderSide: BorderSide(color: Color(0xFF04558F)),
+                          borderRadius: BorderRadius.circular(8.0),
+                        ),
+                        focusedBorder: OutlineInputBorder(
+                          borderSide: BorderSide(color: Color(0xFF04558F)),
+                          borderRadius: BorderRadius.circular(8.0),
+                        ),
+                      ),
+                    ),
+                    SizedBox(height: 25),
+                    DropdownButtonFormField(
+                      value: _selectedAgama,
+                      items: [
+                        'Islam',
+                        'Kristen Protestan',
+                        'Kristen Katolik',
+                        'Hindu',
+                        'Buddha',
+                        'Konghucu',
+                      ].map((agama) {
+                        return DropdownMenuItem(
+                          value: agama,
+                          child: Text(
+                            agama,
+                            style: TextStyle(fontFamily: 'Poppins'),
+                          ),
+                        );
+                      }).toList(),
+                      onChanged: (newValue) {
+                        setState(() {
+                          _selectedAgama = newValue.toString();
+                        });
+                      },
+                      decoration: InputDecoration(
+                        labelText: 'Agama',
+                        labelStyle: TextStyle(
+                          fontFamily: 'Poppins',
+                        ),
+                        enabledBorder: OutlineInputBorder(
+                          borderSide: BorderSide(color: Color(0xFF04558F)),
+                          borderRadius: BorderRadius.circular(8.0),
+                        ),
+                        focusedBorder: OutlineInputBorder(
+                          borderSide: BorderSide(color: Color(0xFF04558F)),
+                          borderRadius: BorderRadius.circular(8.0),
+                        ),
+                      ),
+                    ),
+                    SizedBox(height: 30,)
+                  ],
+                ),
+              ],
+            ),
           ),
         ),
       ),
@@ -297,6 +294,7 @@ class _IntroductionPageState extends State<IntroductionPage> {
       ),
     );
   }
+
 
   // Fungsi untuk memilih tanggal
   Future<void> _selectDate(BuildContext context) async {

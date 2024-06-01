@@ -360,19 +360,19 @@ class _PlayMeditationState extends State<PlayMeditation> {
                               fontFamily: 'Poppins',
                               fontSize: 16,
                               color:
-                                  (backgroundImage == 'images/rain5_animation.gif' ||
+                                  (backgroundImage == 'images/rain6_animation.gif' ||
                                           backgroundImage ==
                                               'images/islamic.jpeg' ||
                                           backgroundImage ==
                                               'images/kunang_animation.gif' ||
                                           backgroundImage ==
-                                              'images/sakura_animation.gif' ||
+                                              'images/sakura2_animation.gif' ||
                                           backgroundImage ==
                                               'images/ombak_animation.gif' ||
                                           backgroundImage ==
                                               'images/night_animation.gif' ||
                                           backgroundImage ==
-                                              'images/night2_animation.gif' ||
+                                              'images/night4_animation.gif' ||
                                           backgroundImage ==
                                               'images/waterflow2_animation.gif' ||
                                           backgroundImage ==

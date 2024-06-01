@@ -3,7 +3,9 @@ import 'dart:async';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
+import 'package:mentalsehat/users/Meditation/kecemasanTrackList.dart';
 import 'package:mentalsehat/users/answer/user_answer.dart';
 import 'package:mentalsehat/users/solution/kecemasan_solution.dart';
 
@@ -284,19 +286,19 @@ class _KecemasanDiagnosisResultState extends State<KecemasanDiagnosisResults> {
 
     switch (resultCategory) {
       case "Normal":
-        imagePath = 'images/kecemasan_normal.png';
+        imagePath = 'images/cemas_normal.png';
         break;
       case "Kecemasan Ringan":
-        imagePath = 'images/kecemasan_ringan.png';
+        imagePath = 'images/cemas_ringan.png';
         break;
       case "Kecemasan Sedang":
-        imagePath = 'images/kecemasan_sedang.png';
+        imagePath = 'images/cemas_sedang.png';
         break;
       case "Kecemasan Parah":
-        imagePath = 'images/kecemasan_parah.png';
+        imagePath = 'images/cemas_parah.png';
         break;
       case "Kecemasan Sangat Parah":
-        imagePath = 'images/kecemasan_sangatparah.png';
+        imagePath = 'images/cemas_sangatparah.png';
         break;
       default:
         break;
@@ -373,6 +375,41 @@ class _KecemasanDiagnosisResultState extends State<KecemasanDiagnosisResults> {
                   fontSize: 16,
                 ),
               ),
+              SizedBox(height: 12),
+              RichText(
+                text: TextSpan(
+                  style: TextStyle(
+                    fontFamily: 'Poppins',
+                    fontSize: 14,
+                    color: Colors.black, // Set the text color
+                  ),
+                  children: [
+                    TextSpan(
+                      text:
+                          "Cobalah melakukan meditasi mindfulness 'Mengatasi Kecemasan' ",
+                    ),
+                    TextSpan(
+                      text: 'Disini',
+                      style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.blue,
+                        decoration: TextDecoration.underline,
+                      ),
+                      recognizer: TapGestureRecognizer()
+                        ..onTap = () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => KecemasanTrackList(),
+                            ),
+                          );
+                        },
+                    ),
+                  ],
+                ),
+              ),
+              
               Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [

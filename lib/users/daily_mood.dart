@@ -84,7 +84,9 @@ class _DailyMoodState extends State<DailyMood> {
             'Data berhasil disimpan',
             style: TextStyle(fontFamily: 'Poppins'),
           ),
+          backgroundColor: Colors.green,
         ));
+        Navigator.pop(context);
       }
     } catch (error) {
       // Menampilkan snackbar jika terjadi kesalahan
