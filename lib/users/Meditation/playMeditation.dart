@@ -192,33 +192,23 @@ class _PlayMeditationState extends State<PlayMeditation> {
     );
 
     if (isAutoPlayEnabled) {
-      await _playNextIfAvailableAfterCurrent();
-    }
-  }
-
-  Future<void> _playNextIfAvailableAfterCurrent() async {
-    final isPlaying = await audioPlayer.isPlaying.first;
-    if (!isPlaying) {
-      // Jika tidak ada audio yang sedang diputar, lanjutkan ke audio berikutnya
-      _playNextIfAvailable();
-    } else {
-      // Jika audio sedang diputar, tunggu hingga selesai, kemudian lanjutkan ke audio berikutnya
-      await audioPlayer.playlistAudioFinished.first;
       _playNextIfAvailable();
     }
   }
 
-  void _playNextIfAvailable() {
-    if (currentIndex < widget.audioPaths.length - 1) {
-      currentIndex++;
-      setState(() {
-        currentTrackTitle = widget.trackTitles[currentIndex];
-        appBarTitle = currentTrackTitle;
-      });
-      _openAudio(currentIndex);
-    } else {
-      audioPlayer.stop();
-    }
+  void _playNextIfAvailable() async {
+    audioPlayer.playlistAudioFinished.listen((audio) {
+      if (currentIndex < widget.audioPaths.length - 1 && isAutoPlayEnabled) {
+        currentIndex++;
+        setState(() {
+          currentTrackTitle = widget.trackTitles[currentIndex];
+          appBarTitle = currentTrackTitle;
+        });
+        _openAudio(currentIndex);
+      } else {
+        audioPlayer.stop();
+      }
+    });
   }
 
   void _handleBackButton() {
