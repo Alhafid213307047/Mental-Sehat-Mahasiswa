@@ -67,8 +67,70 @@ class _RiwayatDiagnosaPageState extends State<RiwayatDiagnosaPage>
     super.dispose();
   }
 
-  @override
+   @override
   Widget build(BuildContext context) {
+    return StreamBuilder<ConnectivityResult>(
+      stream: _connectivity.onConnectivityChanged,
+      initialData: ConnectivityResult.mobile,
+      builder: (context, snapshot) {
+        if (snapshot.data == ConnectivityResult.none) {
+          // Tidak ada koneksi internet
+          return _buildNoInternetScaffold();
+        } else {
+          // Terdapat koneksi internet
+          return _buildRiwayatDiagnosaPage();
+        }
+      },
+    );
+  }
+
+  Widget _buildNoInternetScaffold() {
+    return Scaffold(
+      body: Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(
+              Icons.warning,
+              color: Colors.orange,
+              size: 60,
+            ),
+            SizedBox(height: 8),
+            Image.asset(
+              'images/noInternet.png',
+              width: 200,
+              height: 200,
+            ),
+            Text(
+              "Oops!",
+              style: TextStyle(
+                fontFamily: 'Poppins',
+                fontSize: 24,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            Text(
+              "Sepertinya sambungan anda telah terputus",
+              style: TextStyle(
+                fontFamily: 'Poppins',
+                fontSize: 13,
+              ),
+            ),
+            SizedBox(height: 2),
+            Text(
+              "Silahkan cek kembali koneksi internet anda",
+              style: TextStyle(
+                fontFamily: 'Poppins',
+                fontSize: 13,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildRiwayatDiagnosaPage() {
     return Scaffold(
       appBar: AppBar(
         title: Text(
@@ -161,7 +223,7 @@ class _RiwayatDiagnosaPageState extends State<RiwayatDiagnosaPage>
               "Oops!",
               style: TextStyle(
                 fontFamily: 'Poppins',
-                fontSize: 30,
+                fontSize: 24,
                 fontWeight: FontWeight.bold,
               ),
             ),
@@ -169,7 +231,7 @@ class _RiwayatDiagnosaPageState extends State<RiwayatDiagnosaPage>
               "Sepertinya sambungan anda telah terputus",
               style: TextStyle(
                 fontFamily: 'Poppins',
-                fontSize: 16,
+                fontSize: 13,
               ),
             ),
             SizedBox(height: 2),
@@ -177,7 +239,7 @@ class _RiwayatDiagnosaPageState extends State<RiwayatDiagnosaPage>
               "Silahkan cek kembali koneksi internet anda",
               style: TextStyle(
                 fontFamily: 'Poppins',
-                fontSize: 16,
+                fontSize: 13,
               ),
             ),
           ],

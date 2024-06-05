@@ -147,7 +147,7 @@ class _SungaiTrackListState extends State<SungaiTrackList> {
               "Oops!",
               style: TextStyle(
                 fontFamily: 'Poppins',
-                fontSize: 30,
+                fontSize: 24,
                 fontWeight: FontWeight.bold,
               ),
             ),
@@ -155,7 +155,7 @@ class _SungaiTrackListState extends State<SungaiTrackList> {
               "Sepertinya sambungan anda telah terputus",
               style: TextStyle(
                 fontFamily: 'Poppins',
-                fontSize: 16,
+                fontSize: 13,
               ),
             ),
             SizedBox(height: 2),
@@ -163,7 +163,7 @@ class _SungaiTrackListState extends State<SungaiTrackList> {
               "Silahkan cek kembali koneksi internet anda",
               style: TextStyle(
                 fontFamily: 'Poppins',
-                fontSize: 16,
+                fontSize: 13,
               ),
             ),
           ],

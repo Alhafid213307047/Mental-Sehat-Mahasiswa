@@ -209,7 +209,7 @@ class _QuestionDepresiState extends State<QuestionDepresi> {
               "Oops!",
               style: TextStyle(
                 fontFamily: 'Poppins',
-                fontSize: 30,
+                fontSize: 24,
                 fontWeight: FontWeight.bold,
               ),
             ),
@@ -217,7 +217,7 @@ class _QuestionDepresiState extends State<QuestionDepresi> {
               "Sepertinya sambungan anda telah terputus",
               style: TextStyle(
                 fontFamily: 'Poppins',
-                fontSize: 16,
+                fontSize: 13,
               ),
             ),
             SizedBox(height: 2),
@@ -225,7 +225,7 @@ class _QuestionDepresiState extends State<QuestionDepresi> {
               "Silahkan cek kembali koneksi internet anda",
               style: TextStyle(
                 fontFamily: 'Poppins',
-                fontSize: 16,
+                fontSize: 13,
               ),
             ),
           ],

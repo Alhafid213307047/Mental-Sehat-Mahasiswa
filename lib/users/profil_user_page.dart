@@ -1,4 +1,7 @@
+import 'dart:async';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:google_sign_in/google_sign_in.dart';
@@ -20,12 +23,26 @@ class _ProfileUserPageState extends State<ProfileUserPage> {
    late String _userName = ''; // variabel untuk menyimpan nama pengguna
   late String _userEmail = ''; // variabel untuk menyimpan email pengguna
   late String _profileImageUrl = ''; 
+  final Connectivity _connectivity = Connectivity();
+  late StreamSubscription<ConnectivityResult> _connectivitySubscription;
 
   @override
   void initState() {
     super.initState();
     // Panggil fungsi untuk mendapatkan data pengguna saat widget diinisialisasi
     _fetchUserData();
+    _connectivitySubscription = _connectivity.onConnectivityChanged.listen(
+      (ConnectivityResult result) {
+        // Handle connectivity changes here if needed
+        setState(() {}); // Trigger rebuild when connectivity changes
+      },
+    );
+  }
+
+  @override
+  void dispose() {
+    _connectivitySubscription.cancel();
+    super.dispose();
   }
 
   Future<void> _fetchUserData() async {
@@ -156,9 +173,70 @@ class _ProfileUserPageState extends State<ProfileUserPage> {
     );
   }
 
-
   @override
   Widget build(BuildContext context) {
+    return StreamBuilder<ConnectivityResult>(
+      stream: _connectivity.onConnectivityChanged,
+      initialData: ConnectivityResult.mobile,
+      builder: (context, snapshot) {
+        if (snapshot.data == ConnectivityResult.none) {
+          // Tidak ada koneksi internet
+          return _buildNoInternet();
+        } else {
+          // Terdapat koneksi internet
+          return _buildProfilUserPage();
+        }
+      },
+    );
+  }
+
+  Widget _buildNoInternet() {
+    return Scaffold(
+      body: Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(
+              Icons.warning,
+              color: Colors.orange,
+              size: 60,
+            ),
+            SizedBox(height: 8),
+            Image.asset(
+              'images/noInternet.png',
+              width: 200,
+              height: 200,
+            ),
+            Text(
+              "Oops!",
+              style: TextStyle(
+                fontFamily: 'Poppins',
+                fontSize: 24,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            Text(
+              "Sepertinya sambungan anda telah terputus",
+              style: TextStyle(
+                fontFamily: 'Poppins',
+                fontSize: 13,
+              ),
+            ),
+            SizedBox(height: 2),
+            Text(
+              "Silahkan cek kembali koneksi internet anda",
+              style: TextStyle(
+                fontFamily: 'Poppins',
+                fontSize: 13,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildProfilUserPage() {
     return Scaffold(
       appBar: AppBar(
         title: Text(
@@ -207,45 +285,47 @@ class _ProfileUserPageState extends State<ProfileUserPage> {
                       ),
 
                       SizedBox(width: 20),
-                      Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            _userName, // Tampilkan nama pengguna
-                            style: TextStyle(
-                              fontFamily: 'Poppins',
-                              fontSize: 22,
-                              fontWeight: FontWeight.bold,
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              _userName, // Tampilkan nama pengguna
+                              style: TextStyle(
+                                fontFamily: 'Poppins',
+                                fontSize: 22,
+                                fontWeight: FontWeight.bold,
+                              ),
                             ),
-                          ),
-                          SizedBox(height: 5),
-                          Text(
-                            _userEmail, // Tampilkan email pengguna
-                            style: TextStyle(
-                              fontFamily: 'Poppins',
-                              fontSize: 16,
+                            SizedBox(height: 5),
+                            Text(
+                              _userEmail, // Tampilkan email pengguna
+                              style: TextStyle(
+                                fontFamily: 'Poppins',
+                                fontSize: 12,
+                              ),
                             ),
-                          ),
-                          SizedBox(height: 10),
-                          InkWell(
-                           onTap: _navigateToDetailProfilePage,
-                            child: Row(
-                              children: [
-                                Text(
-                                  'Lihat Profil Saya',
-                                  style: TextStyle(
-                                    fontFamily: 'Poppins',
-                                    fontSize: 16,
-                                    color: Color(0xFF04558F),
-                                    decoration: TextDecoration.underline,
+                            SizedBox(height: 10),
+                            InkWell(
+                             onTap: _navigateToDetailProfilePage,
+                              child: Row(
+                                children: [
+                                  Text(
+                                    'Lihat Profil Saya',
+                                    style: TextStyle(
+                                      fontFamily: 'Poppins',
+                                      fontSize: 16,
+                                      color: Color(0xFF04558F),
+                                      decoration: TextDecoration.underline,
+                                    ),
                                   ),
-                                ),
-                                SizedBox(width: 5), 
-                                Icon(Icons.arrow_forward_ios, size: 16), 
-                              ],
+                                  SizedBox(width: 5), 
+                                  Icon(Icons.arrow_forward_ios, size: 16), 
+                                ],
+                              ),
                             ),
-                          ),
-                        ],
+                          ],
+                        ),
                       ),
                       Spacer(), // Spacer untuk mengisi ruang kosong
                     ],

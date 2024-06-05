@@ -1,6 +1,8 @@
+import 'dart:async';
 import 'dart:io';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart' as firebase_storage;
 import 'package:flutter/material.dart';
@@ -20,6 +22,8 @@ class _DetailProfileUserState extends State<DetailProfileUser> {
   TextEditingController _umurController = TextEditingController();
   TextEditingController _jenisKelaminController = TextEditingController();
   TextEditingController _tanggalLahirController = TextEditingController();
+  final Connectivity _connectivity = Connectivity();
+  late StreamSubscription<ConnectivityResult> _connectivitySubscription;
 
   bool _isModified = false;
   String? profileImageUrl;
@@ -27,6 +31,12 @@ class _DetailProfileUserState extends State<DetailProfileUser> {
   @override
   void initState() {
     super.initState();
+    _connectivitySubscription = _connectivity.onConnectivityChanged.listen(
+      (ConnectivityResult result) {
+        // Handle connectivity changes here if needed
+        setState(() {}); // Trigger rebuild when connectivity changes
+      },
+    );
     // Mendapatkan data pengguna saat initState
     final user = FirebaseAuth.instance.currentUser;
     if (user != null) {
@@ -42,6 +52,12 @@ class _DetailProfileUserState extends State<DetailProfileUser> {
         });
       });
     }
+  }
+
+  @override
+  void dispose() {
+    _connectivitySubscription.cancel();
+    super.dispose();
   }
 
   // Fungsi untuk mendapatkan data pengguna dari Firestore
@@ -166,6 +182,68 @@ class _DetailProfileUserState extends State<DetailProfileUser> {
 
   @override
   Widget build(BuildContext context) {
+    return StreamBuilder<ConnectivityResult>(
+      stream: _connectivity.onConnectivityChanged,
+      initialData: ConnectivityResult.mobile,
+      builder: (context, snapshot) {
+        if (snapshot.data == ConnectivityResult.none) {
+          // Tidak ada koneksi internet
+          return _buildNoInternetScaffold();
+        } else {
+          // Terdapat koneksi internet
+          return _buildDetailUserPage();
+        }
+      },
+    );
+  }
+
+  Widget _buildNoInternetScaffold() {
+    return Scaffold(
+      body: Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(
+              Icons.warning,
+              color: Colors.orange,
+              size: 60,
+            ),
+            SizedBox(height: 8),
+            Image.asset(
+              'images/noInternet.png',
+              width: 200,
+              height: 200,
+            ),
+            Text(
+              "Oops!",
+              style: TextStyle(
+                fontFamily: 'Poppins',
+                fontSize: 24,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            Text(
+              "Sepertinya sambungan anda telah terputus",
+              style: TextStyle(
+                fontFamily: 'Poppins',
+                fontSize: 13,
+              ),
+            ),
+            SizedBox(height: 2),
+            Text(
+              "Silahkan cek kembali koneksi internet anda",
+              style: TextStyle(
+                fontFamily: 'Poppins',
+                fontSize: 13,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildDetailUserPage() {
     return Scaffold(
       appBar: AppBar(
         title: Text(
