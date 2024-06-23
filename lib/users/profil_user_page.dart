@@ -283,10 +283,8 @@ class _ProfileUserPageState extends State<ProfileUserPage> {
                                 ),
                         ),
                       ),
-
                       SizedBox(width: 20),
-                      Expanded(
-                        child: Column(
+                        Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text(
@@ -302,7 +300,7 @@ class _ProfileUserPageState extends State<ProfileUserPage> {
                               _userEmail, // Tampilkan email pengguna
                               style: TextStyle(
                                 fontFamily: 'Poppins',
-                                fontSize: 12,
+                                fontSize: 13,
                               ),
                             ),
                             SizedBox(height: 10),
@@ -326,7 +324,6 @@ class _ProfileUserPageState extends State<ProfileUserPage> {
                             ),
                           ],
                         ),
-                      ),
                       Spacer(), // Spacer untuk mengisi ruang kosong
                     ],
                   ),

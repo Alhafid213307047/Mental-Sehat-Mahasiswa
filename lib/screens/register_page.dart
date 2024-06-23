@@ -77,6 +77,17 @@ class _RegisterPageState extends State<RegisterPage> {
     }
 
     try {
+      // Mengecek apakah email sudah terdaftar di Firebase Authentication
+      List<String> signInMethods =
+          await FirebaseAuth.instance.fetchSignInMethodsForEmail(email);
+      if (signInMethods.isNotEmpty) {
+        // Email sudah terdaftar dengan metode lain
+        _showErrorSnackbar(
+            'Email ini sudah terdaftar. Silahkan gunakan email lain!.');
+        return;
+      }
+
+      // Melanjutkan pendaftaran jika email belum terdaftar
       UserCredential userCredential = await FirebaseAuth.instance
           .createUserWithEmailAndPassword(email: email, password: password);
       // Kirim email verifikasi
@@ -91,7 +102,13 @@ class _RegisterPageState extends State<RegisterPage> {
           context, MaterialPageRoute(builder: (context) => LoginOption()));
     } on FirebaseAuthException catch (e) {
       print('Error signing up: $e');
-      _showErrorSnackbar('Gagal mendaftar. Email sudah digunakan.');
+      // Menangani pesan kesalahan spesifik
+      if (e.code == 'email-already-in-use') {
+        _showErrorSnackbar(
+            'Email ini sudah terdaftar. Silahkan gunakan email lain!.');
+      } else {
+        _showErrorSnackbar('Gagal mendaftar. Terjadi kesalahan.');
+      }
     }
   }
 
