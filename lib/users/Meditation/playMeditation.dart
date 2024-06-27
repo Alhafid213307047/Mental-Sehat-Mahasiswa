@@ -244,16 +244,8 @@ class _PlayMeditationState extends State<PlayMeditation> {
               Expanded(
                 child: Center(
                   child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    crossAxisAlignment: CrossAxisAlignment.center,
                     children: [
-                      SizedBox(height: 16),
-                      Image.asset(
-                        widget.imageAsset,
-                        width: 150,
-                        height: 150,
-                      ),
-                      SizedBox(height: 16),
+                      SizedBox(height: 30),
                       Text(
                         appBarTitle,
                         textAlign: TextAlign.center,
@@ -279,6 +271,8 @@ class _PlayMeditationState extends State<PlayMeditation> {
                                           'images/waterflow2_animation.gif' ||
                                       backgroundImage ==
                                           'images/motivasi_animation.gif' ||
+                                      backgroundImage ==
+                                          'images/kicauan_burung6.gif' ||
                                       backgroundImage ==
                                           'images/park_animation.gif')
                                   ? Colors.white
